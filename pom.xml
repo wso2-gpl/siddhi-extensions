@@ -4,16 +4,15 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.wso2.siddhi</groupId>
-    <artifactId>siddhi-gpl</artifactId>
+    <groupId>org.wso2.siddhi.gpl</groupId>
+    <artifactId>siddhi</artifactId>
     <packaging>pom</packaging>
     <version>2.2.0-SNAPSHOT</version>
     <name>Siddhi GPL</name>
     <description>Siddhi, high performing Complex Event Processing Engine</description>
 
     <modules>
-        <module>extensions/nlp</module>
-        <module>extensions/geo</module>
+        <module>siddhi-extensions</module>
     </modules>
 
     <dependencyManagement>
@@ -205,5 +204,19 @@
             </releases>
         </repository>
     </repositories>
+
+    <distributionManagement>
+        <repository>
+            <id>wso2.releases</id>
+            <name>WSO2 internal Repository</name>
+            <url>http://maven.wso2.org/nexus/content/repositories/releases/</url>
+        </repository>
+
+        <snapshotRepository>
+            <id>wso2.snapshots</id>
+            <name>WSO2 Snapshot Repository</name>
+            <url>http://maven.wso2.org/nexus/content/repositories/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
 
 </project>
