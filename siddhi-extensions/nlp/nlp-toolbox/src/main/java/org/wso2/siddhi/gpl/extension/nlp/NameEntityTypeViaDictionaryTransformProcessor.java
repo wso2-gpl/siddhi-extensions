@@ -28,6 +28,7 @@ import org.wso2.siddhi.core.event.in.InStream;
 import org.wso2.siddhi.core.exception.QueryCreationException;
 import org.wso2.siddhi.core.executor.expression.ExpressionExecutor;
 import org.wso2.siddhi.core.query.processor.transform.TransformProcessor;
+import org.wso2.siddhi.gpl.extension.nlp.dictionary.Dictionary;
 import org.wso2.siddhi.gpl.extension.nlp.utility.Constants;
 import org.wso2.siddhi.query.api.definition.Attribute;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
@@ -36,7 +37,7 @@ import org.wso2.siddhi.query.api.expression.Variable;
 import org.wso2.siddhi.query.api.expression.constant.StringConstant;
 import org.wso2.siddhi.query.api.extension.annotation.SiddhiExtension;
 
-import java.util.Dictionary;
+import java.util.List;
 import java.util.Set;
 
 /**
