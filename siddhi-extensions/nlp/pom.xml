@@ -11,11 +11,14 @@
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>nlp</artifactId>
-    <packaging>bundle</packaging>
+    <packaging>pom</packaging>
 
     <name>Siddhi Extension - Natural Language Processing</name>
     <description>This is a Siddhi extension that enable natural language processing capability</description>
     <url>http://wso2.org</url>
+    <modules>
+        <module>nlp-toolbox</module>
+    </modules>
 
 
     <dependencies>

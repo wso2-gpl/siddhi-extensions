@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dictionary>
+    <entity id="PERSON">
+        <entry>Bill Addison</entry>
+        <entry>Addison</entry>
+        <entry>Joe</entry>
+    </entity>
+    <entity id="LOCATION">
+        <entry>Mississippi</entry>
+        <entry>Midfield High School</entry>
+        <entry>France</entry>
+    </entity>
+</dictionary>
