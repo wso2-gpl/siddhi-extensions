@@ -47,8 +47,9 @@ public class NameEntityTypeTransformProcessor extends TransformProcessor {
         }
 
         if (expressions.length < 3){
-            throw new QueryCreationException("Query expects at least three parameters. Usage: findNameEntityType(entityType:string, " +
-                    "groupSuccessiveEntities:boolean, text:string)");
+            throw new QueryCreationException("Query expects at least three parameters. Expected: " +
+                    "findNameEntityType(entityType:string, " +
+                    "groupSuccessiveEntities:boolean, text:string) Found:");
         }
 
         String entityTypeParam;

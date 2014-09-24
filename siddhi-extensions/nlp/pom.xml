@@ -11,15 +11,11 @@
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>nlp</artifactId>
-    <packaging>pom</packaging>
+    <packaging>bundle</packaging>
 
     <name>Siddhi Extension - Natural Language Processing</name>
     <description>This is a Siddhi extension that enable natural language processing capability</description>
     <url>http://wso2.org</url>
-    <modules>
-        <module>nlp-toolbox</module>
-    </modules>
-
 
     <dependencies>
         <dependency>
@@ -33,6 +29,11 @@
         <dependency>
             <groupId>org.wso2.siddhi</groupId>
             <artifactId>siddhi-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.siddhi.gpl</groupId>
+            <artifactId>stanford-nlp</artifactId>
+            <version>3.4.0-wso2v1</version>
         </dependency>
         <dependency>
             <groupId>log4j</groupId>
@@ -57,13 +58,11 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Export-Package>
-                            org.wso2.siddhi.*
+                            org.wso2.siddhi.gpl.extension.nlp.*
                         </Export-Package>
                         <Import-Package>
                             *;resolution:=optional
                         </Import-Package>
-                        <Embed-Transitive>true</Embed-Transitive>
-                        <Embed-Dependency>scope=runtime;inline=true</Embed-Dependency>
                         <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>
                 </configuration>
