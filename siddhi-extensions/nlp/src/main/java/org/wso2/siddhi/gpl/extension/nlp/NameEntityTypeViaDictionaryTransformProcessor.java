@@ -19,6 +19,7 @@ import org.wso2.siddhi.query.api.expression.Variable;
 import org.wso2.siddhi.query.api.expression.constant.StringConstant;
 import org.wso2.siddhi.query.api.extension.annotation.SiddhiExtension;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -41,8 +42,9 @@ public class NameEntityTypeViaDictionaryTransformProcessor extends TransformProc
         }
 
         if (expressions.length < 3){
-            throw new QueryCreationException("Query expects at least three parameters. Usage: findNameEntityTypeViaDictionary(entityType:string, " +
-                    "dictionaryFilePath:string, text:string)");
+            throw new QueryCreationException("Query expects at least three parameters. Received only " +
+                    expressions.length + ".\nUsage: findNameEntityTypeViaDictionary(entityType:string, " +
+                    "dictionaryFilePath:string, text:string-variable)");
         }
 
         String entityTypeParam;
@@ -50,14 +52,17 @@ public class NameEntityTypeViaDictionaryTransformProcessor extends TransformProc
             entityTypeParam = ((StringConstant)expressions[0]).getValue();
         } catch (ClassCastException e) {
             logger.error("Error in reading parameter entityType",e);
-            throw new QueryCreationException("Parameter entityType should be of type string");
+            throw new QueryCreationException("First parameter should be of type string. Found " + Constants.getType
+                    (expressions[0]) + ".\nUsage: findNameEntityTypeViaDictionary(entityType:string, " +
+                    "dictionaryFilePath:string, text:string-variable");
         }
 
         try {
             this.entityType = Constants.EntityType.valueOf(entityTypeParam.toUpperCase());
         } catch (IllegalArgumentException e) {
             logger.error("Entity Type ["+ entityTypeParam + "] is not defined", e);
-            throw new QueryCreationException("Parameter entityType should be one of " + Constants.EntityType.values());
+            throw new QueryCreationException("First parameter should be one of " + Arrays.deepToString(Constants
+                    .EntityType.values()) + ". Found " + entityTypeParam);
         }
 
         String dictionaryFilePath;
@@ -65,21 +70,25 @@ public class NameEntityTypeViaDictionaryTransformProcessor extends TransformProc
             dictionaryFilePath = ((StringConstant)expressions[1]).getValue();
         } catch (ClassCastException e) {
             logger.error("Error in reading parameter dictionaryFilePath",e);
-            throw new QueryCreationException("Parameter dictionaryFilePath should be of type string");
+            throw new QueryCreationException("Second parameter should be of type string. Found " + Constants.getType
+                    (expressions[0]) + ".\nUsage: findNameEntityTypeViaDictionary(entityType:string, " +
+                    "dictionaryFilePath:string, text:string-variable");
         }
 
         try {
             dictionary = new Dictionary(entityType, dictionaryFilePath);
         } catch (Exception e) {
             logger.error("Error creating dictionary", e);
-            throw new QueryCreationException("Failed to initialize dictionary");
+            throw new QueryCreationException("Failed to initialize dictionary. Error: [" + e.getMessage() + "]");
         }
 
         if (expressions[2] instanceof Variable){
             inStreamParamPosition = inStreamDefinition.getAttributePosition(((Variable)expressions[2])
                     .getAttributeName());
         }else{
-            throw new QueryCreationException("Third parameter should be a variable");
+            throw new QueryCreationException("Third parameter should be a variable. Found " + Constants.getType
+                    (expressions[2]) + ".\nUsage: findNameEntityTypeViaDictionary(entityType:string, " +
+                    "dictionaryFilePath:string, text:string-variable)");
         }
 
         if (logger.isDebugEnabled()) {

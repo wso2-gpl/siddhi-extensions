@@ -41,6 +41,10 @@ import java.util.regex.Pattern;
 public class RelationshipByRegexTransformProcessor extends TransformProcessor {
 
     private static Logger logger = Logger.getLogger(RelationshipByRegexTransformProcessor.class);
+    /**
+     * represents {}=<word> pattern
+     * used to find named nodes
+     */
     private static final String validationRegex = "(?:[{.*}]\\s*=\\s*)(\\w+)";
 
     private int inStreamParamPosition;
@@ -54,8 +58,9 @@ public class RelationshipByRegexTransformProcessor extends TransformProcessor {
         }
 
         if (expressions.length < 2){
-            throw new QueryCreationException("Query expects at least two parameters. Usage: findRelationshipByRegex" +
-                    "(regex:string, text:string)");
+            throw new QueryCreationException("Query expects at least two parameters. Received only " + expressions
+                    .length + ".\n" +
+                    "Usage: findRelationshipByRegex(regex:string, text:string-variable)");
         }
 
         String regex;
@@ -63,40 +68,48 @@ public class RelationshipByRegexTransformProcessor extends TransformProcessor {
             regex = ((StringConstant)expressions[0]).getValue();
         } catch (ClassCastException e) {
             logger.error("Error in reading parameter regex",e);
-            throw new QueryCreationException("Parameter regex should be of type string");
+            throw new QueryCreationException("First parameter should be of type string. Found " + Constants.getType
+                    (expressions[0]) + ".\n" +
+                    "Usage: findRelationshipByRegex(regex:string, text:string-variable)");
         }
 
         try {
             regexPattern = SemgrexPattern.compile(regex);
         } catch (SemgrexParseException e) {
             logger.error("Error in parsing semgrex pattern",e);
-            throw new QueryCreationException("Cannot parse given regex");
+            throw new QueryCreationException("Cannot parse given regex: " + regex + " Error: [" + e.getMessage() + "]");
         }
 
         Set<String> namedNodeSet = new HashSet<String>();
         Pattern validationPattern = Pattern.compile(validationRegex);
         Matcher validationMatcher = validationPattern.matcher(regex);
         while (validationMatcher.find()){
+            //group 1 of the matcher gives the node name
             namedNodeSet.add(validationMatcher.group(1).trim());
         }
 
         if (!namedNodeSet.contains(Constants.subject)){
-            throw new QueryCreationException("Regex should contain a named node as subject");
+            throw new QueryCreationException("Given regex " + regex + " does not contain a named node as subject. " +
+                    "Expect a node named as {}=subject");
         }
 
         if (!namedNodeSet.contains(Constants.object)){
-            throw new QueryCreationException("Regex should contain a named node as object");
+            throw new QueryCreationException("Given regex " + regex + " does not contain a named node as object. " +
+                    "Expect a node named as {}=object");
         }
 
         if (!namedNodeSet.contains(Constants.verb)){
-            throw new QueryCreationException("Regex should contain a named node as verb");
+            throw new QueryCreationException("Given regex " + regex + " does not contain a named node as verb. Expect" +
+                    " a node named as {}=verb");
         }
 
         if (expressions[1] instanceof Variable){
             inStreamParamPosition = inStreamDefinition.getAttributePosition(((Variable)expressions[1])
                     .getAttributeName());
         }else{
-            throw new QueryCreationException("Second parameter should be a variable");
+            throw new QueryCreationException("Second parameter should be a variable. Found " + Constants.getType
+                    (expressions[1]) + ".\n" +
+                    "Usage: findRelationshipByRegex(regex:string, text:string-variable)");
         }
 
 

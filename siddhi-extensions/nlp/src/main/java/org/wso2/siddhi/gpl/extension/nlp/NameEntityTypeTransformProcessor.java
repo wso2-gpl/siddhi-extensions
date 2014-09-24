@@ -24,6 +24,7 @@ import org.wso2.siddhi.query.api.expression.constant.BoolConstant;
 import org.wso2.siddhi.query.api.expression.constant.StringConstant;
 import org.wso2.siddhi.query.api.extension.annotation.SiddhiExtension;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
@@ -46,39 +47,50 @@ public class NameEntityTypeTransformProcessor extends TransformProcessor {
             logger.debug("Initializing Query ...");
         }
 
+        for (Expression expression:expressions){
+            System.out.println(expression);
+        }
+
         if (expressions.length < 3){
-            throw new QueryCreationException("Query expects at least three parameters. Expected: " +
-                    "findNameEntityType(entityType:string, " +
-                    "groupSuccessiveEntities:boolean, text:string) Found:");
+            throw new QueryCreationException("Query expects at least three parameters. Received only " + expressions
+                    .length + ".\nUsage: findNameEntityType(entityType:string, groupSuccessiveEntities:boolean, " +
+                    "text:string-variable)");
         }
 
         String entityTypeParam;
         try {
             entityTypeParam = ((StringConstant)expressions[0]).getValue();
         } catch (ClassCastException e) {
-            logger.error("Error in reading parameter entityType",e);
-            throw new QueryCreationException("Parameter entityType should be of type string");
+            logger.error("Error in reading parameter entityType");
+            throw new QueryCreationException("First parameter should be of type string. Found " + Constants
+                    .getType(expressions[0]) + ".\nUsage: findNameEntityType(entityType:string, " +
+                    "groupSuccessiveEntities:boolean, text:string-variable)");
         }
 
         try {
             this.entityType = Constants.EntityType.valueOf(entityTypeParam.toUpperCase());
         } catch (IllegalArgumentException e) {
             logger.error("Entity Type ["+ entityTypeParam + "] is not defined",e);
-            throw new QueryCreationException("Parameter entityType should be one of " + Constants.EntityType.values());
+            throw new QueryCreationException("First parameter should be one of " + Arrays.deepToString(Constants
+                    .EntityType.values()) + ". Found " + entityTypeParam);
         }
 
         try {
             groupSuccessiveEntities = ((BoolConstant)expressions[1]).getValue();
         } catch (ClassCastException e) {
             logger.error("Error in reading parameter groupSuccessiveEntities",e);
-            throw new QueryCreationException("Parameter groupSuccessiveEntities should be of type boolean");
+            throw new QueryCreationException("Second parameter should be of type boolean. Found " + Constants.getType
+                    (expressions[1]) + ".\nUsage: findNameEntityType(entityType:string, " +
+                    "groupSuccessiveEntities:boolean, text:string-variable)");
         }
 
         if (expressions[2] instanceof Variable){
             inStreamParamPosition = inStreamDefinition.getAttributePosition(((Variable)expressions[2])
                     .getAttributeName());
         }else{
-            throw new QueryCreationException("Third parameter should be a variable");
+            throw new QueryCreationException("Third parameter should be a variable. Found " + Constants.getType
+                    (expressions[2]) + ".\nUsage: findNameEntityType(entityType:string, " +
+                    "groupSuccessiveEntities:boolean, text:string-variable)");
         }
 
         if (logger.isDebugEnabled()) {
