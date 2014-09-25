@@ -47,10 +47,6 @@ public class NameEntityTypeTransformProcessor extends TransformProcessor {
             logger.debug("Initializing Query ...");
         }
 
-        for (Expression expression:expressions){
-            System.out.println(expression);
-        }
-
         if (expressions.length < 3){
             throw new QueryCreationException("Query expects at least three parameters. Received only " + expressions
                     .length + ".\nUsage: findNameEntityType(entityType:string, groupSuccessiveEntities:boolean, " +
@@ -129,46 +125,43 @@ public class NameEntityTypeTransformProcessor extends TransformProcessor {
         List<CoreMap> sentences = document.get(CoreAnnotations.SentencesAnnotation.class);
 
         if (groupSuccessiveEntities){
-            int previousCount = 0;
-            int count = 0;
-            int previousWordIndex;
             String word;
+            String previousWord;
+            int previousEventIndex;
+            Object [] outStreamData = null;
+            boolean added = false;
 
             for (CoreMap sentence : sentences) {
                 for (CoreLabel token : sentence.get(CoreAnnotations.TokensAnnotation.class)) {
-                    word = token.get(CoreAnnotations.TextAnnotation.class);
                     if (entityType.name().equals(token.get(CoreAnnotations.NamedEntityTagAnnotation.class))) {
-                        count++;
-                        if (previousCount != 0 && (previousCount + 1) == count) {
-                            previousWordIndex = transformedListEvent.getActiveEvents() - 1;
-                            String previousWord = (String)transformedListEvent.getEvent(previousWordIndex).getData0();
+                        word = token.get(CoreAnnotations.TextAnnotation.class);
+                        if (added) {
+                            previousEventIndex = transformedListEvent.getActiveEvents() - 1;
+                            previousWord = (String)transformedListEvent.getEvent(previousEventIndex).getData0();
                             transformedListEvent.removeLast();
 
                             previousWord = previousWord.concat(" " + word);
-                            Object [] outStreamData = new Object[inStreamData.length + 1];
                             outStreamData[0] = previousWord;
-                            System.arraycopy(inStreamData, 0, outStreamData, 1, inStreamData.length);
                             transformedListEvent.addEvent(new InEvent(inEvent.getStreamId(), System.currentTimeMillis(),
                                     outStreamData));
                         } else {
-                            Object [] outStreamData = new Object[inStreamData.length + 1];
+                            outStreamData = new Object[inStreamData.length + 1];
                             outStreamData[0] = word;
                             System.arraycopy(inStreamData, 0, outStreamData, 1, inStreamData.length);
                             transformedListEvent.addEvent(new InEvent(inEvent.getStreamId(), System.currentTimeMillis(),
                                     outStreamData));
                         }
-                        previousCount = count;
+                        added = true;
                     } else {
-                        count = 0;
-                        previousCount = 0;
+                        added = false;
                     }
                 }
             }
         }else {
             for (CoreMap sentence : sentences) {
                 for (CoreLabel token : sentence.get(CoreAnnotations.TokensAnnotation.class)) {
-                    String word = token.get(CoreAnnotations.TextAnnotation.class);
                     if (entityType.name().equals(token.get(CoreAnnotations.NamedEntityTagAnnotation.class))) {
+                        String word = token.get(CoreAnnotations.TextAnnotation.class);
                         Object [] outStreamData = new Object[inStreamData.length + 1];
                         outStreamData[0] = word;
                         System.arraycopy(inStreamData, 0, outStreamData, 1, inStreamData.length);

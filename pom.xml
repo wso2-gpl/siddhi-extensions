@@ -73,6 +73,7 @@
                 <groupId>org.wso2.siddhi</groupId>
                 <artifactId>siddhi-core</artifactId>
                 <version>${project.version}</version>
+                <scope>compile</scope>
                 <!--<scope>runtime</scope>-->
             </dependency>
         </dependencies>

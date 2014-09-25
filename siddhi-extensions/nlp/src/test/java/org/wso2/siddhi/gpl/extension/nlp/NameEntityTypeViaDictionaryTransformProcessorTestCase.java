@@ -81,7 +81,8 @@ public class NameEntityTypeViaDictionaryTransformProcessorTestCase extends NlpTr
 
     @Test
     public void testFindNameEntityTypePerson() throws Exception{
-        List<Event> outputEvents = testFindNameEntityTypeViaDictionary("PERSON", "siddhi-extensions/nlp/src/test/resources/dictionary.xml");
+        String dictionaryFilePath = this.getClass().getClassLoader().getResource("dictionary.xml").getPath();
+        List<Event> outputEvents = testFindNameEntityTypeViaDictionary("PERSON", dictionaryFilePath);
 
         //expecting words that are of the PERSON type
         String[] expectedMatches = {"Obama" , "Bill Gates", "Obama", "Obama", "Kent Brantly", "Paul Allen"};
@@ -93,8 +94,8 @@ public class NameEntityTypeViaDictionaryTransformProcessorTestCase extends NlpTr
 
     @Test
     public void testFindNameEntityTypeLocation() throws Exception{
-        List<Event> outputEvents = testFindNameEntityTypeViaDictionary("LOCATION",
-                "siddhi-extensions/nlp/src/test/resources/dictionary.xml");
+        String dictionaryFilePath = this.getClass().getClassLoader().getResource("dictionary.xml").getPath();
+        List<Event> outputEvents = testFindNameEntityTypeViaDictionary("LOCATION", dictionaryFilePath);
 
         //expecting words that are of the LOCATION type
         String[] expectedMatches = {"Africa" , "Morocco", "Africa", "Atlanta", "Africa", "Africa"};
@@ -106,8 +107,8 @@ public class NameEntityTypeViaDictionaryTransformProcessorTestCase extends NlpTr
 
     @Test
     public void testFindNameEntityTypeDate() throws Exception{
-        List<Event> outputEvents = testFindNameEntityTypeViaDictionary("DATE",
-                "siddhi-extensions/nlp/src/test/resources/dictionary.xml");
+        String dictionaryFilePath = this.getClass().getClassLoader().getResource("dictionary.xml").getPath();
+        List<Event> outputEvents = testFindNameEntityTypeViaDictionary("DATE", dictionaryFilePath);
 
         //expecting words that are of the DATE type
         String[] expectedMatches = {"Tuesday" , "Tuesday", "yesterday", "September"};
@@ -119,8 +120,8 @@ public class NameEntityTypeViaDictionaryTransformProcessorTestCase extends NlpTr
 
     @Test
     public void testFindNameEntityTypeMoney() throws Exception{
-        List<Event> outputEvents = testFindNameEntityTypeViaDictionary("MONEY",
-                "siddhi-extensions/nlp/src/test/resources/dictionary.xml");
+        String dictionaryFilePath = this.getClass().getClassLoader().getResource("dictionary.xml").getPath();
+        List<Event> outputEvents = testFindNameEntityTypeViaDictionary("MONEY", dictionaryFilePath);
 
         //expecting words that are of the MONEY type
         String[] expectedMatches = {"million" , "million", "USD", "million", "million", "million", "million"};
