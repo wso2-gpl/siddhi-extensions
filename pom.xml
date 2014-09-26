@@ -73,7 +73,7 @@
                 <groupId>org.wso2.siddhi</groupId>
                 <artifactId>siddhi-core</artifactId>
                 <version>${project.version}</version>
-                <scope>runtime</scope>
+                <scope>compile</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -110,7 +110,7 @@
                     <reportFormat>brief</reportFormat>
                     <useFile>false</useFile>
                     <forkMode>once</forkMode>
-                    <argLine>-ea -Xmx512m</argLine>
+                    <argLine>-ea -Xmx1g</argLine>
                 </configuration>
             </plugin>
             <plugin>

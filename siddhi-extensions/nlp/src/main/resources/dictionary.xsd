@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <!-- definition of simple elements -->
+    <xs:element name="entry" type="xs:string"/>
+
+    <!-- definition of attributes -->
+    <xs:attribute name="id">
+        <xs:simpleType>
+            <xs:restriction base="xs:string">
+                <xs:enumeration value="PERSON"/>
+                <xs:enumeration value="LOCATION"/>
+                <xs:enumeration value="ORGANIZATION"/>
+                <xs:enumeration value="MONEY"/>
+                <xs:enumeration value="DATE"/>
+                <xs:enumeration value="TIME"/>
+                <xs:enumeration value="PERCENT"/>
+            </xs:restriction>
+        </xs:simpleType>
+    </xs:attribute>
+
+    <!-- definition of complex elements -->
+    <xs:element name="entity">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="entry" maxOccurs="unbounded" minOccurs="0"/>
+            </xs:sequence>
+            <xs:attribute ref="id" use="required"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="dictionary">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="entity" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>

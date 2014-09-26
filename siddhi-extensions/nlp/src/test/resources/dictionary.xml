@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dictionary>
+    <entity id="PERSON">
+        <entry>Obama</entry>
+        <entry>Kent Brantly</entry>
+		<entry>Bill Gates</entry>
+		<entry>Paul Allen</entry>
+    </entity>
+    <entity id="LOCATION">
+        <entry>Africa</entry>
+        <entry>Atlanta</entry>
+        <entry>Mississippi</entry>
+        <entry>Morocco</entry>
+    </entity>
+    <entity id="DATE">
+        <entry>yesterday</entry>
+        <entry>Tuesday</entry>
+        <entry>Today</entry>
+        <entry>September</entry>
+        <entry>Friday</entry>
+    </entity>
+    <entity id="MONEY">
+        <entry>million</entry>
+        <entry>LKR</entry>
+        <entry>USD</entry>
+    </entity>
+</dictionary>
