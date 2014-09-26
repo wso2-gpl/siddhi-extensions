@@ -14,8 +14,8 @@
     <name>Siddhi Extensions</name>
 
     <modules>
-        <module>nlp/stanford-nlp</module>
         <module>nlp</module>
+        <!--<module>geo</module>-->
     </modules>
 
 </project>
