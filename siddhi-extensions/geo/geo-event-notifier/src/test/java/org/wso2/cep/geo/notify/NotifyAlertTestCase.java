@@ -17,6 +17,24 @@ public class NotifyAlertTestCase extends GeoNotifyTestCase {
     private static List<Boolean> expectedResult;
     private static int eventCount = 0;
 
+    @BeforeClass
+    public static void loadData() throws Exception {
+        data = new ArrayList<String[]>();
+        expectedResult = new ArrayList<Boolean>();
+
+        data.add(new String[]{"km-4354", "12.56", "56.32", "12345684", "NORMAL", "NORMAL driving pattern"});
+        expectedResult.add(false);
+
+        data.add(new String[]{"km-4354", "12.56", "56.32", "12345684", "NORMAL", "NOT NORMAL driving pattern"});
+        expectedResult.add(true);
+
+        data.add(new String[]{"km-4354", "12.56", "56.32", "12345684", "NORMAL", "NOT NORMAL driving pattern"});
+        expectedResult.add(false);
+
+        data.add(new String[]{"km-4354", "12.56", "56.32", "12345684", "NORMAL", "NORMAL driving pattern"});
+        expectedResult.add(true);
+    }
+
     @Test
     public void testProcess() throws Exception {
         logger.info("TestProcess");
@@ -42,24 +60,6 @@ public class NotifyAlertTestCase extends GeoNotifyTestCase {
     @Override
     public void setUpChild() {
         siddhiManager.defineStream("define stream dataIn (id string, latitude double, longitude double, eventId string, state string, information string )");
-    }
-
-    @BeforeClass
-    public static void loadData() throws Exception {
-        data = new ArrayList<String[]>();
-        expectedResult = new ArrayList<Boolean>();
-
-        data.add(new String[]{"km-4354", "12.56", "56.32", "12345684", "NORMAL", "NORMAL driving pattern"});
-        expectedResult.add(false);
-
-        data.add(new String[]{"km-4354", "12.56", "56.32", "12345684", "NORMAL", "NOT NORMAL driving pattern"});
-        expectedResult.add(true);
-
-        data.add(new String[]{"km-4354", "12.56", "56.32", "12345684", "NORMAL", "NOT NORMAL driving pattern"});
-        expectedResult.add(false);
-
-        data.add(new String[]{"km-4354", "12.56", "56.32", "12345684", "NORMAL", "NORMAL driving pattern"});
-        expectedResult.add(true);
     }
 
     private void generateEvents() throws Exception {

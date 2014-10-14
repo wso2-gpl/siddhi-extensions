@@ -12,14 +12,10 @@ import java.util.List;
 
 public abstract class GeoNotifyTestCase {
 
-    private static Logger logger = Logger.getLogger(NotifyAlert.class);
-
     protected static SiddhiManager siddhiManager;
-
+    private static Logger logger = Logger.getLogger(NotifyAlert.class);
     protected long start;
     protected long end;
-
-    public abstract void setUpChild();
 
     @BeforeClass
     public static void setUp() throws Exception {
@@ -36,16 +32,18 @@ public abstract class GeoNotifyTestCase {
 
     }
 
-    @Before
-    public void setUpChildren() {
-        setUpChild();
-    }
-
     @AfterClass
     public static void tearDown() throws Exception {
         Thread.sleep(1000);
         logger.info("Shutting down Siddhi");
         siddhiManager.shutdown();
+    }
+
+    public abstract void setUpChild();
+
+    @Before
+    public void setUpChildren() {
+        setUpChild();
     }
 
 }

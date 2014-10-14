@@ -28,7 +28,7 @@ import java.util.UUID;
 @SiddhiExtension(namespace = "geo", function = "generateEventId")
 public class EventIdGenerator extends FunctionExecutor {
 
-//    Logger log = Logger.getLogger(CustomFunctionExtension.class);
+    //    Logger log = Logger.getLogger(CustomFunctionExtension.class);
     Attribute.Type returnType;
 
     /**

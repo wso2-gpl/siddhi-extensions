@@ -205,7 +205,7 @@ public class FuseEvents extends WindowProcessor {
 
         Object[] dataOut = new Object[]{
                 data[0], // id
-                Double.parseDouble(data[1].toString()) , // Latitude
+                Double.parseDouble(data[1].toString()), // Latitude
                 Double.parseDouble(data[2].toString()), // Longitude
                 data[3].toString(), // TimeStamp
                 Float.parseFloat(data[4].toString()), // Speed

@@ -9,7 +9,9 @@
     <version>1.0-SNAPSHOT</version>
 
     <name>Siddhi Extension - Geo event ID generator</name>
-    <description>This is a Siddhi extension that generate unique identifier for each incoming spatial event to recognize the event in the event fusion stage</description>
+    <description>This is a Siddhi extension that generate unique identifier for each incoming spatial event to recognize
+        the event in the event fusion stage
+    </description>
     <url>http://wso2.org</url>
 
     <repositories>

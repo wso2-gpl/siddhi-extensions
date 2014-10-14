@@ -1,7 +1,10 @@
 package org.wso2.cep.geo.libs;
 
 import org.apache.log4j.Logger;
-import org.junit.*;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.config.SiddhiConfiguration;
 import org.wso2.siddhi.core.event.Event;
@@ -9,19 +12,22 @@ import org.wso2.siddhi.core.query.output.callback.QueryCallback;
 import org.wso2.siddhi.core.stream.input.InputHandler;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
 public class FuseEventsTestCase {
+    protected static SiddhiManager siddhiManager;
     private static Logger logger = Logger.getLogger(FuseEventsTestCase.class);
     private static List<String[]> data;
-
-    protected static SiddhiManager siddhiManager;
-
     protected long start;
     protected long end;
 
+    @AfterClass
+    public static void tearDown() throws Exception {
+        Thread.sleep(1000);
+        logger.info("Shutting down Siddhi");
+        siddhiManager.shutdown();
+    }
 
     @Test
     public void testProcess() throws Exception {
@@ -53,12 +59,11 @@ public class FuseEventsTestCase {
                 for (Event event : inEvents) {
                     eventsCount++;
                 }
-                Assert.assertEquals("1",eventsCount.toString());
+                Assert.assertEquals("1", eventsCount.toString());
             }
         });
         generateEvents();
     }
-
 
     private void generateEvents() throws Exception {
         InputHandler inputHandler = siddhiManager.getInputHandler("dataIn");
@@ -92,12 +97,5 @@ public class FuseEventsTestCase {
         data.add(new String[]{"km-4354", "12.56", "56.32", UUID.randomUUID().toString(), "NORMAL", "NOT NORMAL driving pattern"});
         data.add(new String[]{"km-4354", "12.56", "56.32", UUID.randomUUID().toString(), "NORMAL", "NORMAL driving pattern"});
 
-    }
-
-    @AfterClass
-    public static void tearDown() throws Exception {
-        Thread.sleep(1000);
-        logger.info("Shutting down Siddhi");
-        siddhiManager.shutdown();
     }
 }

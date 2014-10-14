@@ -9,7 +9,9 @@
     <version>1.0-SNAPSHOT</version>
 
     <name>Siddhi Extension - Geo event notifier</name>
-    <description>This is a Siddhi extension that check whether event cause a notification(Change information string) or not</description>
+    <description>This is a Siddhi extension that check whether event cause a notification(Change information string) or
+        not
+    </description>
     <url>http://wso2.org</url>
 
     <repositories>

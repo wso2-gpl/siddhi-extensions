@@ -1,9 +1,9 @@
 package org.wso2.cep.geo.proximity;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
 import org.geotools.geometry.jts.JTSFactoryFinder;
 import org.wso2.siddhi.core.config.SiddhiContext;
 import org.wso2.siddhi.core.executor.function.FunctionExecutor;
@@ -11,10 +11,9 @@ import org.wso2.siddhi.query.api.definition.Attribute;
 import org.wso2.siddhi.query.api.definition.Attribute.Type;
 import org.wso2.siddhi.query.api.extension.annotation.SiddhiExtension;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 @SiddhiExtension(namespace = "geo", function = "geoProximity")
 public class GeoProximity extends FunctionExecutor {
@@ -67,7 +66,7 @@ public class GeoProximity extends FunctionExecutor {
         double bufferRadius = proximityDist / 110574.61087757687;// to convert
         // to degrees
         /*
-		Computes a buffer area around this geometry having the given width.
+        Computes a buffer area around this geometry having the given width.
 		The buffer of a Geometry is the Minkowski sum or difference of the geometry with a disc of radius abs(distance).
 		The buffer is constructed using 8 segments per quadrant to represent curves. The end cap style is CAP_ROUND
 		*/
@@ -154,12 +153,11 @@ public class GeoProximity extends FunctionExecutor {
         return finalOutput;
     }
 
-    public String makeCompositeKey(String key1, String key2){
+    public String makeCompositeKey(String key1, String key2) {
         String compositeKey;
-        if (key1.compareToIgnoreCase(key2) < 0){
+        if (key1.compareToIgnoreCase(key2) < 0) {
             compositeKey = key1 + key2;
-        }
-        else {
+        } else {
             compositeKey = key2 + key1;
         }
         return compositeKey;

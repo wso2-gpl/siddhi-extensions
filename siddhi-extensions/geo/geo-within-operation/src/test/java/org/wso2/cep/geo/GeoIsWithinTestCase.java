@@ -1,7 +1,10 @@
 package org.wso2.cep.geo;
 
 import org.apache.log4j.Logger;
-import org.junit.*;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.config.SiddhiConfiguration;
 import org.wso2.siddhi.core.event.Event;
@@ -13,48 +16,13 @@ import java.util.List;
 import java.util.UUID;
 
 public class GeoIsWithinTestCase {
+    protected static SiddhiManager siddhiManager;
     private static Logger logger = Logger.getLogger(GeoIsWithinTestCase.class);
     private static List<String[]> data;
     private static List<Boolean> expectedOutput;
-    int eventNumber = 0;
-    protected static SiddhiManager siddhiManager;
-
     protected long start;
     protected long end;
-
-
-    @Test
-    public void testProcess() throws Exception {
-        logger.info("Starting testProcess");
-        String withinCheckExecutionPlan = "from dataIn \n" +
-                "select id, latitude, longitude, eventId, state, information, \n" +
-                "geo:iswithin(longitude,latitude,\"{'type':'Polygon','coordinates':[[[79.85395431518555,6.915009335274164],[79.85395431518555,6.941081755563143],[79.88382339477539,6.941081755563143],[79.88382339477539,6.915009335274164],[79.85395431518555,6.915009335274164]]]}\") as isWithin \n"+
-                "insert into dataOut;";
-
-        start = System.currentTimeMillis();
-        String withinCheckExecutionPlanReference = siddhiManager.addQuery(withinCheckExecutionPlan);
-        end = System.currentTimeMillis();
-
-        logger.info(String.format("Time to add query: [%f sec]", ((end - start) / 1000f)));
-        siddhiManager.addCallback(withinCheckExecutionPlanReference, new QueryCallback() {
-            @Override
-            public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
-                for (Event event : inEvents) {
-                    Boolean isWithin = (Boolean) event.getData(6);
-                    Assert.assertEquals(expectedOutput.get(eventNumber++),isWithin);
-                }
-            }
-        });
-        generateEvents();
-    }
-
-
-    private void generateEvents() throws Exception {
-        InputHandler inputHandler = siddhiManager.getInputHandler("dataIn");
-        for (String[] dataLine : data) {
-            inputHandler.send(new Object[]{dataLine[0], Double.valueOf(dataLine[1]), Double.valueOf(dataLine[2]), dataLine[3], dataLine[4], dataLine[5]});
-        }
-    }
+    int eventNumber = 0;
 
     @BeforeClass
     public static void setUp() throws Exception {
@@ -91,5 +59,37 @@ public class GeoIsWithinTestCase {
         Thread.sleep(1000);
         logger.info("Shutting down Siddhi");
         siddhiManager.shutdown();
+    }
+
+    @Test
+    public void testProcess() throws Exception {
+        logger.info("Starting testProcess");
+        String withinCheckExecutionPlan = "from dataIn \n" +
+                "select id, latitude, longitude, eventId, state, information, \n" +
+                "geo:iswithin(longitude,latitude,\"{'type':'Polygon','coordinates':[[[79.85395431518555,6.915009335274164],[79.85395431518555,6.941081755563143],[79.88382339477539,6.941081755563143],[79.88382339477539,6.915009335274164],[79.85395431518555,6.915009335274164]]]}\") as isWithin \n" +
+                "insert into dataOut;";
+
+        start = System.currentTimeMillis();
+        String withinCheckExecutionPlanReference = siddhiManager.addQuery(withinCheckExecutionPlan);
+        end = System.currentTimeMillis();
+
+        logger.info(String.format("Time to add query: [%f sec]", ((end - start) / 1000f)));
+        siddhiManager.addCallback(withinCheckExecutionPlanReference, new QueryCallback() {
+            @Override
+            public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
+                for (Event event : inEvents) {
+                    Boolean isWithin = (Boolean) event.getData(6);
+                    Assert.assertEquals(expectedOutput.get(eventNumber++), isWithin);
+                }
+            }
+        });
+        generateEvents();
+    }
+
+    private void generateEvents() throws Exception {
+        InputHandler inputHandler = siddhiManager.getInputHandler("dataIn");
+        for (String[] dataLine : data) {
+            inputHandler.send(new Object[]{dataLine[0], Double.valueOf(dataLine[1]), Double.valueOf(dataLine[2]), dataLine[3], dataLine[4], dataLine[5]});
+        }
     }
 }

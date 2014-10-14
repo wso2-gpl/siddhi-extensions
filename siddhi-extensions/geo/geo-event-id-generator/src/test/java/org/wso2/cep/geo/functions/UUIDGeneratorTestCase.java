@@ -17,6 +17,16 @@ public class UUIDGeneratorTestCase extends EventIdGeneratorTestCase {
     private static List<String[]> data;
     private static int eventCount = 0;
 
+    @BeforeClass
+    public static void loadData() throws Exception {
+        data = new ArrayList<String[]>();
+
+        data.add(new String[]{"km-4354", "8.641987", "79.35022", "32.21"});
+        data.add(new String[]{"km-4354", "8.549587", "79.36022", "12.21"});
+        data.add(new String[]{"km-4354", "8.569867", "79.37022", "56.21"});
+        data.add(new String[]{"km-4354", "8.564879", "79.33022", "29.21"});
+    }
+
     @Test
     public void testProcess() throws Exception {
         logger.info("TestProcess");
@@ -33,8 +43,8 @@ public class UUIDGeneratorTestCase extends EventIdGeneratorTestCase {
             public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
                 for (Event event : inEvents) {
                     String uuid = (String) event.getData(4);
-                    logger.info("UUID = "+uuid);
-                    Assert.assertEquals(true,isUUID(uuid));
+                    logger.info("UUID = " + uuid);
+                    Assert.assertEquals(true, isUUID(uuid));
                 }
             }
         });
@@ -44,16 +54,6 @@ public class UUIDGeneratorTestCase extends EventIdGeneratorTestCase {
     @Override
     public void setUpChild() {
         siddhiManager.defineStream("define stream dataIn (id string, latitude double, longitude double, speed float)");
-    }
-
-    @BeforeClass
-    public static void loadData() throws Exception {
-        data = new ArrayList<String[]>();
-
-        data.add(new String[]{"km-4354", "8.641987", "79.35022", "32.21"});
-        data.add(new String[]{"km-4354", "8.549587", "79.36022", "12.21"});
-        data.add(new String[]{"km-4354", "8.569867", "79.37022", "56.21"});
-        data.add(new String[]{"km-4354", "8.564879", "79.33022", "29.21"});
     }
 
     private void generateEvents() throws Exception {

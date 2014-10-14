@@ -22,20 +22,20 @@ package org.wso2.cep.geo.libs;
 public class ExecutionPlansCount {
     public static Integer numberOfExecutionPlans = 0;
 
-    public static Integer getNumberOfExecutionPlans(){
-        return (Integer)ExecutionPlansCount.numberOfExecutionPlans/2;
+    public static Integer getNumberOfExecutionPlans() {
+        return (Integer) ExecutionPlansCount.numberOfExecutionPlans / 2;
     }
 
     public static void setNumberOfExecutionPlans(Integer numberOfExecutionPlans) {
         ExecutionPlansCount.numberOfExecutionPlans = numberOfExecutionPlans;
     }
 
-    public static void upCount(){
-        ExecutionPlansCount.numberOfExecutionPlans +=1;
+    public static void upCount() {
+        ExecutionPlansCount.numberOfExecutionPlans += 1;
     }
 
-    public static void downCount(){
+    public static void downCount() {
         // TODO: -1 is due to a bug(https://wso2.org/jira/browse/CEP-953) in current version of CEP, when it is fixed need to change the -2 to -1 here and also in getNumberOfExecutionPlans '/2'
-        ExecutionPlansCount.numberOfExecutionPlans -=1;
+        ExecutionPlansCount.numberOfExecutionPlans -= 1;
     }
 }

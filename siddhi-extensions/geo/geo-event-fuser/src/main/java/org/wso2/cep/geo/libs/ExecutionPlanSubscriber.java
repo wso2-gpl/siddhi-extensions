@@ -20,24 +20,18 @@ package org.wso2.cep.geo.libs;
 
 import org.apache.log4j.Logger;
 import org.wso2.siddhi.core.config.SiddhiContext;
-import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.event.in.InEvent;
 import org.wso2.siddhi.core.event.in.InListEvent;
 import org.wso2.siddhi.core.event.in.InStream;
 import org.wso2.siddhi.core.executor.expression.ExpressionExecutor;
 import org.wso2.siddhi.core.query.processor.transform.TransformProcessor;
-import org.wso2.siddhi.query.api.definition.Attribute;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 import org.wso2.siddhi.query.api.expression.Expression;
-import org.wso2.siddhi.query.api.expression.Variable;
 import org.wso2.siddhi.query.api.extension.annotation.SiddhiExtension;
-import org.wso2.siddhi.query.compiler.SiddhiCompiler;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static org.wso2.siddhi.query.compiler.SiddhiCompiler.*;
 
 /*
 * TODO: 1. Where is "outStreamDefinition" (spatialEventsInnerStream) reside in the CEP?
@@ -47,49 +41,56 @@ import static org.wso2.siddhi.query.compiler.SiddhiCompiler.*;
 @SiddhiExtension(namespace = "geo", function = "subscribeExecutionPlan")
 public class ExecutionPlanSubscriber extends TransformProcessor {
     private static Logger logger = Logger.getLogger(ExecutionPlanSubscriber.class);
-    private Map<String, Integer> paramPositions = new HashMap<String, Integer>();
     Boolean initialized = false;
+    private Map<String, Integer> paramPositions = new HashMap<String, Integer>();
+
     public ExecutionPlanSubscriber() {
 
     }
+
     @Override
     protected InStream processEvent(InEvent inEvent) {
         return inEvent;
     }
+
     @Override
     protected InStream processEvent(InListEvent inListEvent) {
         return inListEvent;
     }
+
     @Override
     protected Object[] currentState() {
         return new Object[]{paramPositions};
     }
+
     @Override
     protected void restoreState(Object[] objects) {
         if (objects.length > 0 && objects[0] instanceof Map) {
             paramPositions = (Map<String, Integer>) objects[0];
         }
     }
+
     @Override
     protected void init(Expression[] parameters, List<ExpressionExecutor> expressionExecutors, StreamDefinition inStreamDefinition, StreamDefinition outStreamDefinition, String elementId, SiddhiContext siddhiContext) {
         logger.info("Calling init");
         this.outStreamDefinition = this.inStreamDefinition;
-        if (!initialized){
+        if (!initialized) {
             upCount();
             this.initialized = true;
         }
     }
+
     @Override
     public void destroy() {
         downCount();
     }
 
-    void upCount(){
+    void upCount() {
         ExecutionPlansCount.upCount();
         logger.info("upCountNumberOfExecutionPlans current count after update = " + ExecutionPlansCount.getNumberOfExecutionPlans());
     }
 
-    void downCount(){
+    void downCount() {
         ExecutionPlansCount.downCount();
         logger.info("downCountNumberOfExecutionPlans current count after update = " + ExecutionPlansCount.getNumberOfExecutionPlans());
     }
