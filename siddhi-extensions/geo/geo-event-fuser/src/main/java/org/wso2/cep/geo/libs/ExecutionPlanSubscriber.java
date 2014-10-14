@@ -50,8 +50,6 @@ public class ExecutionPlanSubscriber extends TransformProcessor {
     private Map<String, Integer> paramPositions = new HashMap<String, Integer>();
     Boolean initialized = false;
     public ExecutionPlanSubscriber() {
-//        this.outStreamDefinition = parseStreamDefinition("define stream dataIn (id string, latitude double, longitude double, eventId string, state string, information string )");
-//        upCount();
 
     }
     @Override
@@ -88,12 +86,12 @@ public class ExecutionPlanSubscriber extends TransformProcessor {
 
     void upCount(){
         ExecutionPlansCount.upCount();
-        logger.info("DEBUG: upCountNumberOfExecutionPlans current count after update = " + ExecutionPlansCount.getNumberOfExecutionPlans());
+        logger.info("upCountNumberOfExecutionPlans current count after update = " + ExecutionPlansCount.getNumberOfExecutionPlans());
     }
 
     void downCount(){
         ExecutionPlansCount.downCount();
-        logger.info("DEBUG: downCountNumberOfExecutionPlans current count after update = " + ExecutionPlansCount.getNumberOfExecutionPlans());
+        logger.info("downCountNumberOfExecutionPlans current count after update = " + ExecutionPlansCount.getNumberOfExecutionPlans());
     }
 
 }

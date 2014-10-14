@@ -18,11 +18,6 @@ public class NotifyAlertTestCase extends GeoNotifyTestCase {
     private static int eventCount = 0;
 
     @Test
-    public void testInit() throws Exception {
-        System.out.println("testInit");
-    }
-
-    @Test
     public void testProcess() throws Exception {
         logger.info("TestProcess");
         String query = "from dataIn \n" +

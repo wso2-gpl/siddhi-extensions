@@ -7,6 +7,10 @@
 
 	<packaging>bundle</packaging>
 
+    <name>Siddhi Extension - Geo Proximity operation</name>
+    <description>This is a Siddhi extension that checks two points for given proximity threshold value, if two points close to each other more than the threshold value rerun value will be true and else otherwise</description>
+    <url>http://wso2.org</url>
+
 	<properties>
 		<geotools.version>12-SNAPSHOT</geotools.version>
 	</properties>

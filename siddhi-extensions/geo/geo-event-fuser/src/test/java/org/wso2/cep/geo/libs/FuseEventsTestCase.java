@@ -82,16 +82,15 @@ public class FuseEventsTestCase {
         siddhiManager = new SiddhiManager(siddhiConfiguration);
 
 
-        logger.info("DEBUG: calling setUpChild");
+        logger.info("calling setUpChild");
         siddhiManager.defineStream("define stream dataIn (id string, latitude double, longitude double, eventId string, state string, information string )");
 
         data = new ArrayList<String[]>();
 
         data.add(new String[]{"km-4354", "12.56", "56.32", UUID.randomUUID().toString(), "NORMAL", "NORMAL driving pattern"});
-        //TODO: uncomment below lines for more data feed
-//        data.add(new String[]{"km-4354", "12.56", "56.32", UUID.randomUUID().toString(), "NORMAL", "NOT NORMAL driving pattern"});
-//        data.add(new String[]{"km-4354", "12.56", "56.32", UUID.randomUUID().toString(), "NORMAL", "NOT NORMAL driving pattern"});
-//        data.add(new String[]{"km-4354", "12.56", "56.32", UUID.randomUUID().toString(), "NORMAL", "NORMAL driving pattern"});
+        data.add(new String[]{"km-4354", "12.56", "56.32", UUID.randomUUID().toString(), "NORMAL", "NOT NORMAL driving pattern"});
+        data.add(new String[]{"km-4354", "12.56", "56.32", UUID.randomUUID().toString(), "NORMAL", "NOT NORMAL driving pattern"});
+        data.add(new String[]{"km-4354", "12.56", "56.32", UUID.randomUUID().toString(), "NORMAL", "NORMAL driving pattern"});
 
     }
 
