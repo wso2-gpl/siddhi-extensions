@@ -5,7 +5,7 @@
     <parent>
         <artifactId>siddhi-extensions</artifactId>
         <groupId>org.wso2.siddhi.gpl</groupId>
-        <version>2.2.0-SNAPSHOT</version>
+        <version>3.0.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -20,11 +20,11 @@
     <dependencies>
         <dependency>
             <groupId>org.wso2.siddhi</groupId>
-            <artifactId>siddhi-api</artifactId>
+            <artifactId>siddhi-query-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.wso2.siddhi</groupId>
-            <artifactId>siddhi-query</artifactId>
+            <artifactId>siddhi-query-compiler</artifactId>
         </dependency>
         <dependency>
             <groupId>org.wso2.siddhi</groupId>

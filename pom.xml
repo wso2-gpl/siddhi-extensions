@@ -4,16 +4,36 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <groupId>org.wso2</groupId>
+        <artifactId>wso2</artifactId>
+        <version>1</version>
+    </parent>
+
     <groupId>org.wso2.siddhi.gpl</groupId>
     <artifactId>siddhi</artifactId>
     <packaging>pom</packaging>
-    <version>2.2.0-SNAPSHOT</version>
+    <version>3.0.0-SNAPSHOT</version>
     <name>Siddhi GPL</name>
     <description>Siddhi, high performing Complex Event Processing Engine</description>
 
     <modules>
         <module>siddhi-extensions</module>
     </modules>
+
+    <licenses>
+        <license>
+            <name>GNU General Public License (GPL)</name>
+            <url>http://www.gnu.org/licenses/gpl.txt</url>
+        </license>
+    </licenses>
+
+    <scm>
+        <url>https://github.com/wso2/siddhi.git</url>
+        <developerConnection>scm:git:https://github.com/wso2/siddhi.git</developerConnection>
+        <connection>scm:git:https://github.com/wso2/siddhi.git</connection>
+        <tag>HEAD</tag>
+    </scm>
 
     <dependencyManagement>
         <dependencies>
@@ -60,13 +80,20 @@
                 <scope>compile</scope>
             </dependency>
             <dependency>
+                <groupId>edu.stanford.nlp.wso2</groupId>
+                <artifactId>stanford-nlp</artifactId>
+                <version>${stanford-nlp.version}</version>
+            </dependency>
+
+
+            <dependency>
                 <groupId>org.wso2.siddhi</groupId>
-                <artifactId>siddhi-api</artifactId>
+                <artifactId>siddhi-query-api</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.siddhi</groupId>
-                <artifactId>siddhi-query</artifactId>
+                <artifactId>siddhi-query-compiler</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -86,12 +113,35 @@
                 <version>2.1</version>
             </extension>
         </extensions>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>2.3.2</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>2.4.3</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>2.1.2</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>2.8</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <!-- compiler plugin configuration -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
                 <configuration>
                     <source>1.6</source>
                     <target>1.6</target>
@@ -102,7 +152,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.4.3</version>
                 <configuration>
                     <includes>
                         <include>**/*TestCase.java</include>
@@ -116,7 +165,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>2.1.2</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -129,7 +177,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.8</version>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
@@ -146,6 +193,7 @@
         <junit.version>4.10</junit.version>
         <log4j.version>1.2.14</log4j.version>
         <mvel2.version>2.0.19</mvel2.version>
+        <stanford-nlp.version>3.4.0-wso2v1</stanford-nlp.version>
         <antlr.runtime.version>3.4</antlr.runtime.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -174,9 +222,9 @@
             <name>Stanford internal Repository</name>
             <url>http://mu.lti.cs.cmu.edu:8081/nexus/content/groups/public/</url>
             <!--<releases>-->
-                <!--<enabled>true</enabled>-->
-                <!--<updatePolicy>daily</updatePolicy>-->
-                <!--<checksumPolicy>ignore</checksumPolicy>-->
+            <!--<enabled>true</enabled>-->
+            <!--<updatePolicy>daily</updatePolicy>-->
+            <!--<checksumPolicy>ignore</checksumPolicy>-->
             <!--</releases>-->
         </repository>
 
