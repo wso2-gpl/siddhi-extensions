@@ -32,20 +32,21 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Collections;
 
-/*Check whether a spatial object
-* is in a defined stationery
+/*When a Geo fence is specified by drawing an area, Using this extension we can
+* check whether the spatial object is inside that drawn geo face for a
+* specified time period.
 * */
 @SiddhiExtension(namespace = "geo", function = "withinstationery")
 public class GeoInStationery extends FunctionExecutor {
 
-    private GeometryFactory geometryFactory;
-    private Object geometryType;
-    private Map geoSyncMap;
     private static final double TO_DEGREE = 110574.61087757687;
     private static final String COORDINATES = "coordinates";
     private static final String POLYGON = "\"Polygon\"";
     private static final String CIRCLE = "\"Point\"";
     private static final String RADIUS = "radius";
+    private GeometryFactory geometryFactory;
+    private Object geometryType;
+    private Map geoSyncMap;
 
     /**
      * Method will be called when initialising the custom function
@@ -56,7 +57,7 @@ public class GeoInStationery extends FunctionExecutor {
     public void init(Attribute.Type[] types, SiddhiContext siddhiContext) {
 
         Map<String, String> geoMap = new HashMap<String, String>();
-        geoSyncMap= Collections.synchronizedMap(geoMap);
+        geoSyncMap = Collections.synchronizedMap(geoMap);
 
         if (types[0] != Attribute.Type.DOUBLE || types[1] != Attribute.Type.DOUBLE) {
             throw new QueryCreationException("lattitude and longitude must be provided as double values");
@@ -69,7 +70,6 @@ public class GeoInStationery extends FunctionExecutor {
         String strGeometry = (String) attributeExpressionExecutors.get(2).execute(null);
         JsonObject jsonObject = new JsonParser().parse(strGeometry).getAsJsonObject();
         geometryFactory = JTSFactoryFinder.getGeometryFactory();
-
 
         //if the drawn shape is a polygon
         if (jsonObject.get("type").toString().equals(POLYGON)) {
@@ -89,7 +89,7 @@ public class GeoInStationery extends FunctionExecutor {
 
         } else if (jsonObject.get("type").toString().equals(CIRCLE)) {
 
-            JsonArray jLocCoordinatesArray = (JsonArray) jsonObject.getAsJsonArray(COORDINATES);
+            JsonArray jLocCoordinatesArray = jsonObject.getAsJsonArray(COORDINATES);
             Coordinate[] coords = new Coordinate[jLocCoordinatesArray.size()];
 
             for (int i = 0; i < jLocCoordinatesArray.size(); i++) {
@@ -114,11 +114,12 @@ public class GeoInStationery extends FunctionExecutor {
     protected Object process(Object data) {
 
         Object functionParams[] = (Object[]) data;
-        double lattitude = (Double)functionParams[0];
-        double longitude = (Double)functionParams[1];
+        double lattitude = (Double) functionParams[0];
+        double longitude = (Double) functionParams[1];
         String currentId = functionParams[3].toString();
         double currentTime = Double.parseDouble(functionParams[4].toString());
-        double givenTime = Double.parseDouble(functionParams[5].toString()) * 1000; // Time take in UI front-end is seconds so here we convert it to milliseconds
+        double givenTime = Double.parseDouble(functionParams[5].toString())
+                * 1000; // Time take in UI front-end is seconds so here we convert it to milliseconds
         double timeDiff;
         boolean withinStationery = false;
         boolean inStationery = false;
@@ -128,39 +129,34 @@ public class GeoInStationery extends FunctionExecutor {
         Point currentPoint = geometryFactory.createPoint(coord);
         String pickedTime = String.valueOf(currentTime);
 
-        if(geometryType instanceof Polygon){//if the drawn shape is a polygon
- 
+        if (geometryType instanceof Polygon) {//if the drawn shape is a polygon
             if (currentPoint.within((Polygon) geometryType)) {
                 withinStationery = true;
             }
 
-        } else if (!(geometryType instanceof Polygon)) { //since logic has only two shapes. Should change if there are many
+        } else { //since logic has only two shapes. Should change if there are many
 
             if (currentPoint.within((Geometry) geometryType)) {
                 withinStationery = true;
             }
-
         }
 
         if (withinStationery) {
 
             if (!geoSyncMap.containsKey(currentId)) {// if the object not already within the stationery
-
                 geoSyncMap.put(currentId, pickedTime);
             }
 
             double previousTime = Double.parseDouble(geoSyncMap.get(currentId).toString());
-
             timeDiff = currentTime - previousTime;
 
-            if (timeDiff >= givenTime) { // if the time deference is more than or equal to given time then generate the alert
-
+            if (timeDiff
+                    >= givenTime) { // if the time deference is more than or equal to given time then generate the alert
                 inStationery = true;
             }
         } else {
 
             if (geoSyncMap.containsKey(currentId)) {
-
                 geoSyncMap.remove(currentId);
             }
         }
@@ -172,14 +168,12 @@ public class GeoInStationery extends FunctionExecutor {
 
     }
 
-
     /**
      * Return type of the custom function mentioned
      *
      * @return
      */
     public Attribute.Type getReturnType() {
-
         return Attribute.Type.BOOL;
     }
 
