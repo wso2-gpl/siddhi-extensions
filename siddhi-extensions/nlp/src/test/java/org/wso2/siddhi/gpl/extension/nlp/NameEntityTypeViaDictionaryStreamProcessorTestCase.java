@@ -4,19 +4,14 @@ import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.wso2.siddhi.core.event.Event;
-import org.wso2.siddhi.core.exception.QueryCreationException;
-import org.wso2.siddhi.core.query.output.callback.QueryCallback;
-import org.wso2.siddhi.core.stream.input.InputHandler;
+import org.wso2.siddhi.query.api.exception.ExecutionPlanValidationException;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-
-public class NameEntityTypeViaDictionaryTransformProcessorTestCase extends NlpTransformProcessorTestCase {
-    private static Logger logger = Logger.getLogger(NameEntityTypeViaDictionaryTransformProcessorTestCase.class);
-    private static List<String[]> data;
+public class NameEntityTypeViaDictionaryStreamProcessorTestCase extends NlpTransformProcessorTestCase {
+    private static Logger logger = Logger.getLogger(NameEntityTypeViaDictionaryStreamProcessorTestCase.class);
+    private static String defineStream = "define stream NameEntityTypeViaDictionaryIn (username string, text string);";
 
     @BeforeClass
     public static void loadData() {
@@ -74,145 +69,102 @@ public class NameEntityTypeViaDictionaryTransformProcessorTestCase extends NlpTr
     }
 
 
-    @Override
-    public void setUpChild() {
-        siddhiManager.defineStream("define stream NameEntityTypeViaDictionaryIn (username string, text string )");
-    }
-
     @Test
-    public void testFindNameEntityTypePerson() throws Exception{
+    public void testFindNameEntityTypePerson() throws Exception {
         String dictionaryFilePath = this.getClass().getClassLoader().getResource("dictionary.xml").getPath();
         List<Event> outputEvents = testFindNameEntityTypeViaDictionary("PERSON", dictionaryFilePath);
 
         //expecting words that are of the PERSON type
-        String[] expectedMatches = {"Obama" , "Bill Gates", "Obama", "Obama", "Kent Brantly", "Paul Allen"};
+        String[] expectedMatches = {"Obama", "Bill Gates", "Obama", "Obama", "Kent Brantly", "Paul Allen"};
         //InStream event index for each expected match defined above
-        int[] matchedInStreamIndices = {3,6,8,9,14,19};
+        int[] matchedInStreamIndices = {3, 6, 8, 9, 14, 19};
 
         assertOutput(outputEvents, expectedMatches, matchedInStreamIndices);
     }
 
     @Test
-    public void testFindNameEntityTypeLocation() throws Exception{
+    public void testFindNameEntityTypeLocation() throws Exception {
         String dictionaryFilePath = this.getClass().getClassLoader().getResource("dictionary.xml").getPath();
         List<Event> outputEvents = testFindNameEntityTypeViaDictionary("LOCATION", dictionaryFilePath);
 
         //expecting words that are of the LOCATION type
-        String[] expectedMatches = {"Africa" , "Morocco", "Africa", "Atlanta", "Africa", "Africa"};
+        String[] expectedMatches = {"Africa", "Morocco", "Africa", "Atlanta", "Africa", "Africa"};
         //InStream event index for each expected match defined above
-        int[] matchedInStreamIndices = {1,2,2,3,13,15};
+        int[] matchedInStreamIndices = {1, 2, 2, 3, 13, 15};
 
         assertOutput(outputEvents, expectedMatches, matchedInStreamIndices);
     }
 
     @Test
-    public void testFindNameEntityTypeDate() throws Exception{
+    public void testFindNameEntityTypeDate() throws Exception {
         String dictionaryFilePath = this.getClass().getClassLoader().getResource("dictionary.xml").getPath();
         List<Event> outputEvents = testFindNameEntityTypeViaDictionary("DATE", dictionaryFilePath);
 
         //expecting words that are of the DATE type
-        String[] expectedMatches = {"Tuesday" , "Tuesday", "yesterday", "September"};
+        String[] expectedMatches = {"Tuesday", "Tuesday", "yesterday", "September"};
         //InStream event index for each expected match defined above
-        int[] matchedInStreamIndices = {3,9,10,11};
+        int[] matchedInStreamIndices = {3, 9, 10, 11};
 
         assertOutput(outputEvents, expectedMatches, matchedInStreamIndices);
     }
 
     @Test
-    public void testFindNameEntityTypeMoney() throws Exception{
+    public void testFindNameEntityTypeMoney() throws Exception {
         String dictionaryFilePath = this.getClass().getClassLoader().getResource("dictionary.xml").getPath();
         List<Event> outputEvents = testFindNameEntityTypeViaDictionary("MONEY", dictionaryFilePath);
 
         //expecting words that are of the MONEY type
-        String[] expectedMatches = {"million" , "million", "USD", "million", "million", "million", "million"};
+        String[] expectedMatches = {"million", "million", "USD", "million", "million", "million", "million"};
         //InStream event index for each expected match defined above
-        int[] matchedInStreamIndices = {5,6,7,8,13,19};
+        int[] matchedInStreamIndices = {5, 6, 7, 8, 13, 19};
 
         assertOutput(outputEvents, expectedMatches, matchedInStreamIndices);
     }
 
-    @Test(expected = org.wso2.siddhi.core.exception.QueryCreationException.class)
+    @Test(expected = ExecutionPlanValidationException.class)
     public void testQueryCreationExceptionInvalidNoOfParams() {
         logger.info("Test: QueryCreationException at Invalid No Of Params");
-        siddhiManager.addQuery("from NameEntityTypeViaDictionaryIn#transform.nlp:findNameEntityTypeViaDictionary" +
+        siddhiManager.createExecutionPlanRuntime(defineStream + "from NameEntityTypeViaDictionaryIn#nlp:findNameEntityTypeViaDictionary" +
                 "        ('src/test/resources/dictionaryTest.xml',text) \n" +
                 "        select *  \n" +
                 "        insert into FindNameEntityTypeViaDictionaryResult;\n");
     }
 
-    @Test(expected = QueryCreationException.class)
-    public void testQueryCreationExceptionTypeMismatchEntityType(){
+    @Test(expected = ExecutionPlanValidationException.class)
+    public void testQueryCreationExceptionTypeMismatchEntityType() {
         logger.info("Test: QueryCreationException at EntityType type mismatch");
-        siddhiManager.addQuery("from NameEntityTypeViaDictionaryIn#transform.nlp:findNameEntityTypeViaDictionary" +
+        siddhiManager.createExecutionPlanRuntime(defineStream + "from NameEntityTypeViaDictionaryIn#nlp:findNameEntityTypeViaDictionary" +
                 "        ( 1234,'src/test/resources/dictionaryTest.xml',text ) \n" +
                 "        select *  \n" +
                 "        insert into FindNameEntityTypeViaDictionaryResult;\n");
     }
 
-    @Test(expected = QueryCreationException.class)
-    public void testQueryCreationExceptionInvalidFilePath(){
+    @Test(expected = ExecutionPlanValidationException.class)
+    public void testQueryCreationExceptionInvalidFilePath() {
         logger.info("Test: QueryCreationException at Invalid file path");
-        siddhiManager.addQuery("from NameEntityTypeViaDictionaryIn#transform.nlp:findNameEntityTypeViaDictionary" +
+        siddhiManager.createExecutionPlanRuntime(defineStream + "from NameEntityTypeViaDictionaryIn#nlp:findNameEntityTypeViaDictionary" +
                 "        ( 'PERSON' , 'src/resources/dictionaryTest.xml', text ) \n" +
                 "        select *  \n" +
                 "        insert into FindNameEntityTypeViaDictionaryResult;\n");
     }
 
-    @Test(expected = QueryCreationException.class)
-    public void testQueryCreationExceptionUndefinedEntityType(){
+    @Test(expected = ExecutionPlanValidationException.class)
+    public void testQueryCreationExceptionUndefinedEntityType() {
         logger.info("Test: QueryCreationException at undefined EntityType");
-        siddhiManager.addQuery("from NameEntityTypeViaDictionaryIn#transform.nlp:findNameEntityTypeViaDictionary" +
+        siddhiManager.createExecutionPlanRuntime(defineStream + "from NameEntityTypeViaDictionaryIn#nlp:findNameEntityTypeViaDictionary" +
                 "        ( 'DEGREE' , 'src/test/resources/dictionaryTest.xml', text ) \n" +
                 "        select *  \n" +
                 "        insert into FindNameEntityTypeViaDictionaryResult;\n");
     }
 
 
-    private List<Event> testFindNameEntityTypeViaDictionary(String entityType, String filePath) throws Exception{
-        logger.info(String.format("Test: EntityType = %s", entityType
-        ));
-        String query = "from NameEntityTypeViaDictionaryIn#transform.nlp:findNameEntityTypeViaDictionary" +
+    private List<Event> testFindNameEntityTypeViaDictionary(String entityType, String filePath) throws Exception {
+        logger.info(String.format("Test: EntityType = %s", entityType));
+        String query = "@info(name = 'query1') from NameEntityTypeViaDictionaryIn#nlp:findNameEntityTypeViaDictionary" +
                 "        ( '%s' , '%s', text ) \n" +
                 "        select *  \n" +
                 "        insert into FindNameEntityTypeViaDictionaryResult;\n";
-        start = System.currentTimeMillis();
-        String queryReference = siddhiManager.addQuery(String.format(query, entityType, filePath));
-        end = System.currentTimeMillis();
 
-        logger.info(String.format("Time to add query: [%f sec]", ((end - start)/1000f)));
-
-        final List<Event> eventList = new ArrayList<Event>();
-
-        siddhiManager.addCallback(queryReference, new QueryCallback() {
-            @Override
-            public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
-                for (Event event:inEvents){
-                    Collections.addAll(eventList, event.toArray());
-                }
-            }
-        });
-
-        generateEvents();
-
-        return eventList;
-    }
-
-    private void generateEvents() throws Exception{
-        InputHandler inputHandler = siddhiManager.getInputHandler("NameEntityTypeViaDictionaryIn");
-        for(String[] dataLine:data) {
-            inputHandler.send(new Object[]{dataLine[0], dataLine[1]});
-        }
-    }
-
-    private void assertOutput(List<Event> outputEvents, String[] expectedMatches, int[] inStreamIndices){
-        for (int i = 0; i < outputEvents.size(); i++){
-            Event event = outputEvents.get(i);
-            //Compare expected output stream match and received match
-            assertEquals(expectedMatches[i], event.getData(0));
-            //Compare expected output stream username and received username
-            assertEquals(data.get(inStreamIndices[i])[0], event.getData(1));
-            //Compare expected output stream text and received text
-            assertEquals(data.get(inStreamIndices[i])[1], event.getData(2));
-        }
+        return runQuery(defineStream + String.format(query, entityType, filePath), "query1", "NameEntityTypeViaDictionaryIn");
     }
 }

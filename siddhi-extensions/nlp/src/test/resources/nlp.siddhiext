@@ -1,0 +1,8 @@
+findNameEntityType=org.wso2.siddhi.gpl.extension.nlp.NameEntityTypeStreamProcessor
+findNameEntityTypeViaDictionary=org.wso2.siddhi.gpl.extension.nlp.NameEntityTypeViaDictionaryStreamProcessor
+findRelationshipByRegex=org.wso2.siddhi.gpl.extension.nlp.RelationshipByRegexStreamProcessor
+findRelationshipByVerb=org.wso2.siddhi.gpl.extension.nlp.RelationshipByVerbStreamProcessor
+findSemgrexPattern=org.wso2.siddhi.gpl.extension.nlp.SemgrexPatternStreamProcessor
+findTokensRegexPattern=org.wso2.siddhi.gpl.extension.nlp.TokensRegexPatternStreamProcessor
+
+
