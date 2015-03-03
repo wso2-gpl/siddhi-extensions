@@ -9,12 +9,54 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
+    <groupId>org.wso2.siddhi.gpl.extensions</groupId>
     <artifactId>geo</artifactId>
 
     <packaging>bundle</packaging>
 
-    <name>Siddhi Extension - Geo fencing</name>
-    <description>This is a Siddhi extension that enable Geo fencing capability</description>
+    <name>Siddhi Geo Extensions</name>
+    <description>
+        FunctionExecutors
+        1.  GeoWithinFunctionExecutor
+            Input : (longitude double, latitude double, geoJSONGeometryFence string)
+                 OR (geoJSONGeometry string, geoJSONGeometryFence string)
+            Output : true if (longitude, latitude) or geoJSONGeometry is within the geoJSONGeometryFence
+
+        2.  GeoIntersectsFunctionExecutor
+            Input : (longitude double, latitude double, geoJSONGeometryFence string)
+                 OR (geoJSONGeometry string, geoJSONGeometryFence string)
+            Output : true if (longitude, latitude) or geoJSONGeometry intersects the geoJSONGeometryFence
+
+        3.  GeoWithinDistanceFunctionExecutor
+            Input : (longitude double, latitude double, geoJSONGeometryFence string, distance double)
+                 OR (geoJSONGeometry string, geoJSONGeometryFence string, distance double)
+            Output : true if (longitude, latitude) or geoJSONGeometry is within distance of the geoJSONGeometryFence
+
+        StreamProcessors
+        1. GeoCrossesStreamProcessor
+            Input : (id string, longitude double, latitude double, geoJSONGeometryFence string)
+                 OR (id string, geoJSONGeometry string, geoJSONGeometryFence string)
+            Output : an event with `crosses` additional attribute set to true when the object ((longitude, latitude) or geoJSONGeometry)
+                     crosses into geoJSONGeometryFence and an event with `crosses` additional attribute set to false
+                     when the object crosses out of the geoJSONGeometryFence
+
+        2. GeoStationaryStreamProcessor
+            Input : (id string, longitude double, latitude double, geoJSONGeometryFence string, radius double)
+                 OR (id string, geoJSONGeometry string, geoJSONGeometryFence string, radius double)
+            Output : when the object ((longitude, latitude) or geoJSONGeometry) starts being stationary within the radius
+                     an event with `stationary` additional attribute set to true. When the object starts to move out of the radius
+                     an event with `stationary` additional attribute set to false.
+
+        3. GeoProximityStreamProcessor
+            Input : (id string, longitude double, latitude double, geoJSONGeometryFence string, radius double)
+                 OR (id string, geoJSONGeometry string, geoJSONGeometryFence string, radius double)
+            Output : when two objects ((longitude, latitude) or geoJSONGeometry) starts being in close proximity within the radius
+                     an event with `inCloseProximity` additional attribute set to true. When the object starts to move out of the radius
+                     an event with `inCloseProximity` additional. attribute set to false. On each event, additional attributes
+                     `proximityWith` gives the id of the object that this object is in close proximity and `proximityId` is an id unique to
+                     the pair of objects
+
+    </description>
     <url>http://wso2.org</url>
 
     <dependencies>
@@ -39,8 +81,46 @@
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.2.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-geojson</artifactId>
+            <version>${geotools.version}</version>
+        </dependency>
     </dependencies>
+    <properties>
+        <geotools.version>13-RC1</geotools.version>
+    </properties>
 
+    <repositories>
+        <repository>
+            <id>wso2-maven2-repository</id>
+            <name>WSO2 Maven2 Repository</name>
+            <url>http://dist.wso2.org/maven2</url>
+        </repository>
+        <repository>
+            <id>maven2-repository.dev.java.net</id>
+            <name>Java.net repository</name>
+            <url>http://download.java.net/maven/2</url>
+        </repository>
+        <repository>
+            <id>osgeo</id>
+            <name>Open Source Geospatial Foundation Repository</name>
+            <url>http://download.osgeo.org/webdav/geotools/</url>
+        </repository>
+        <repository>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <id>opengeo</id>
+            <name>OpenGeo Maven Repository</name>
+            <url>http://repo.opengeo.org</url>
+        </repository>
+    </repositories>
     <build>
         <plugins>
             <plugin>
@@ -50,15 +130,18 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-                        <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Export-Package>
-                            org.wso2.siddhi.gpl.extension.geo.*
+                            com.vividsolutions.*,org.jdom.*,
+                            javax.media.*,org.geotools.*,org.wso2.cep.*,
+                            org.wso2.siddhi.gpl.extensions.geo.stream.*;
+                            org.wso2.siddhi.gpl.extensions.geo.function.*;
                         </Export-Package>
+                        <Private-Package>
+                            org.wso2.siddhi.gpl.extensions.geo.internal.util.*;
+                        </Private-Package>
                         <Import-Package>
                             *;resolution:=optional
                         </Import-Package>
-                        <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>
                 </configuration>
             </plugin>
