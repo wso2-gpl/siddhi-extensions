@@ -15,6 +15,7 @@
 package org.wso2.siddhi.gpl.extension.nlp.dictionary;
 
 import org.apache.log4j.Logger;
+import org.wso2.siddhi.core.exception.ExecutionPlanCreationException;
 import org.wso2.siddhi.gpl.extension.nlp.utility.Constants;
 import org.xml.sax.SAXException;
 
@@ -54,7 +55,6 @@ public class Dictionary {
     private void init() throws Exception {
         File xmlFile = new File(xmlFilePath);
         if (!xmlFile.canRead()) {
-            logger.error("Cannot read the given Dictionary file " + xmlFilePath);
             throw new RuntimeException("Cannot read the XML file : " + xmlFilePath);
         }
 
@@ -66,8 +66,7 @@ public class Dictionary {
         try {
             schema = schemaFactory.newSchema(xsdFileUrl);
         } catch (SAXException e) {
-            logger.error("Failed to build the schema. Error: [" + e.getMessage() + "]");
-            throw e;
+            throw new ExecutionPlanCreationException("Failed to build the schema.", e);
         }
 
         DictionaryHandler dictionaryHandler = new DictionaryHandler(entityType, this);
@@ -83,8 +82,7 @@ public class Dictionary {
 
             logger.info("Dictionary XML Parse [SUCCESS]");
         } catch (SAXException e) {
-            logger.error("Failed to parse the given Dictionary XML file. Error: [" + e.getMessage() + "]");
-            throw e;
+            throw new ExecutionPlanCreationException("Failed to parse the given Dictionary XML file.", e);
         }
     }
 

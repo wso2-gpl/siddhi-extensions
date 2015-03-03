@@ -91,7 +91,6 @@ public class RelationshipByVerbStreamProcessor extends StreamProcessor {
                         ".\nUsage: #nlp.findRelationshipByVerb(verb:string, text:string-variable)");
             }
         } catch (ClassCastException e) {
-            logger.error("Error in reading parameter verb", e);
             throw new ExecutionPlanCreationException("First parameter should be of type string. Found " +
                     attributeExpressionExecutors[0].getReturnType() +
                     ".\nUsage: #nlp.findRelationshipByVerb(verb:string, text:string-variable)");
@@ -101,7 +100,6 @@ public class RelationshipByVerbStreamProcessor extends StreamProcessor {
             verbOptSubPattern = SemgrexPattern.compile(String.format(verbOptSub,verb));
             verbOptObjPattern = SemgrexPattern.compile(String.format(verbOptObj,verb));
         } catch (SemgrexParseException e) {
-            logger.error("Error in initializing relation extracting pattern for verb",e);
             throw new ExecutionPlanCreationException("First parameter is not a verb. Found " + verb +
                     "\nUsage: #nlp.findRelationshipByVerb(verb:string, text:string-variable)");
         }

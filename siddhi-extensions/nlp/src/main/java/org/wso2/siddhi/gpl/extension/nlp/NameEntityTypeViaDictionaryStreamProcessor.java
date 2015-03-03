@@ -62,7 +62,6 @@ public class NameEntityTypeViaDictionaryStreamProcessor extends StreamProcessor 
                 throw new ExecutionPlanCreationException("First parameter should be a constant.");
             }
         } catch (ClassCastException e) {
-            logger.error("Error in reading parameter entityType", e);
             throw new ExecutionPlanCreationException("First parameter should be of type string. Found " +
                     attributeExpressionExecutors[0].getReturnType() +
                     ".\nUsage: findNameEntityTypeViaDictionary(entityType:string, " +
@@ -72,7 +71,6 @@ public class NameEntityTypeViaDictionaryStreamProcessor extends StreamProcessor 
         try {
             this.entityType = Constants.EntityType.valueOf(entityTypeParam.toUpperCase());
         } catch (IllegalArgumentException e) {
-            logger.error("Entity Type [" + entityTypeParam + "] is not defined", e);
             throw new ExecutionPlanCreationException("First parameter should be one of " + Arrays.deepToString(Constants
                     .EntityType.values()) + ". Found " + entityTypeParam);
         }
@@ -85,7 +83,6 @@ public class NameEntityTypeViaDictionaryStreamProcessor extends StreamProcessor 
                 throw new ExecutionPlanCreationException("Second parameter should be a constant.");
             }
         } catch (ClassCastException e) {
-            logger.error("Error in reading parameter dictionaryFilePath", e);
             throw new ExecutionPlanCreationException("Second parameter should be of type string. Found " +
                     attributeExpressionExecutors[0].getReturnType() +
                     ".\nUsage: findNameEntityTypeViaDictionary(entityType:string, " +
@@ -95,7 +92,6 @@ public class NameEntityTypeViaDictionaryStreamProcessor extends StreamProcessor 
         try {
             dictionary = new Dictionary(entityType, dictionaryFilePath);
         } catch (Exception e) {
-            logger.error("Error creating dictionary", e);
             throw new ExecutionPlanCreationException("Failed to initialize dictionary.", e);
         }
 

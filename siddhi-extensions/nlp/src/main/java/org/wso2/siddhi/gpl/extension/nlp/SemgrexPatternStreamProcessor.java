@@ -87,7 +87,6 @@ public class SemgrexPatternStreamProcessor extends StreamProcessor {
                         ".\nUsage: #nlp.findSemgrexPattern(regex:string, text:string-variable)");
             }
         } catch (ClassCastException e) {
-            logger.error("Error in reading parameter regex", e);
             throw new ExecutionPlanCreationException("First parameter should be of type string. Found " +
                     attributeExpressionExecutors[0].getReturnType() +
                     ".\nUsage: #nlp.findSemgrexPattern(regex:string, text:string-variable)");
@@ -96,7 +95,6 @@ public class SemgrexPatternStreamProcessor extends StreamProcessor {
         try {
             regexPattern = SemgrexPattern.compile(regex);
         } catch (SemgrexParseException e) {
-            logger.error("Error in parsing semgrex pattern", e);
             throw new ExecutionPlanCreationException("Cannot parse given regex: " + regex, e);
         }
 

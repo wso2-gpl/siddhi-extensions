@@ -79,7 +79,6 @@ public class TokensRegexPatternStreamProcessor extends StreamProcessor {
                         ".\nUsage: #nlp.findTokensRegexPattern(regex:string, text:string-variable)");
             }
         } catch (ClassCastException e) {
-            logger.error("Error in reading parameter regex", e);
             throw new ExecutionPlanCreationException("First parameter should be of type string. Found " +
                     attributeExpressionExecutors[0].getReturnType() +
                     ".\nUsage: #nlp.findTokensRegexPattern(regex:string, text:string-variable)");
@@ -88,7 +87,6 @@ public class TokensRegexPatternStreamProcessor extends StreamProcessor {
         try {
             regexPattern = TokenSequencePattern.compile(regex);
         } catch (Exception e) {
-            logger.error("Error in parsing token regex pattern", e);
             throw new ExecutionPlanCreationException("Cannot parse given regex " + regex, e);
         }
 

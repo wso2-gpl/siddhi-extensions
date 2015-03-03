@@ -18,7 +18,6 @@ import org.apache.log4j.Logger;
 import org.wso2.siddhi.gpl.extension.nlp.utility.Constants;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
@@ -49,16 +48,16 @@ public class DictionaryHandler extends DefaultHandler {
 
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-        if (qName.equalsIgnoreCase(Constants.DictionaryTag.ENTITY.getTag())){
+        if (qName.equalsIgnoreCase(Constants.DictionaryTag.ENTITY.getTag())) {
             read = attributes.getValue(Constants.DictionaryTag.ID.getTag()).equalsIgnoreCase(entityType.name());
         }
     }
 
     @Override
     public void endElement(String uri, String localName, String qName) throws SAXException {
-        if(read){
-            if(qName.equalsIgnoreCase(Constants.DictionaryTag.ENTRY.getTag())){
-                dictionary.addEntry(entityType,value);
+        if (read) {
+            if (qName.equalsIgnoreCase(Constants.DictionaryTag.ENTRY.getTag())) {
+                dictionary.addEntry(entityType, value);
             }
         }
     }
@@ -66,23 +65,5 @@ public class DictionaryHandler extends DefaultHandler {
     @Override
     public void characters(char[] chars, int start, int length) throws SAXException {
         value = String.copyValueOf(chars, start, length).trim();
-    }
-
-    @Override
-    public void warning(SAXParseException e) throws SAXException {
-        logger.warn(e.getMessage());
-        throw e;
-    }
-
-    @Override
-    public void error(SAXParseException e) throws SAXException {
-        logger.error(e.getMessage());
-        throw e;
-    }
-
-    @Override
-    public void fatalError(SAXParseException e) throws SAXException {
-        logger.fatal(e.getMessage());
-        throw e;
     }
 }

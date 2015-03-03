@@ -74,7 +74,6 @@ public class NameEntityTypeStreamProcessor extends StreamProcessor {
         try {
             entityTypeParam = (attributeExpressionExecutors[0]).execute(null).toString();
         } catch (ClassCastException e) {
-            logger.error("Error in reading parameter entityType");
             throw new ExecutionPlanCreationException("First parameter should be of type string. Found " +
                     attributeExpressionExecutors[0].getReturnType() +
                     ".\nUsage: findNameEntityType(entityType:string, " +
@@ -84,7 +83,6 @@ public class NameEntityTypeStreamProcessor extends StreamProcessor {
         try {
             this.entityType = Constants.EntityType.valueOf(entityTypeParam.toUpperCase());
         } catch (IllegalArgumentException e) {
-            logger.error("Entity Type [" + entityTypeParam + "] is not defined", e);
             throw new ExecutionPlanCreationException("First parameter should be one of " + Arrays.deepToString(Constants
                     .EntityType.values()) + ". Found " + entityTypeParam);
         }
@@ -92,7 +90,6 @@ public class NameEntityTypeStreamProcessor extends StreamProcessor {
         try {
             groupSuccessiveEntities = (Boolean) (attributeExpressionExecutors[1]).execute(null);
         } catch (ClassCastException e) {
-            logger.error("Error in reading parameter groupSuccessiveEntities", e);
             throw new ExecutionPlanCreationException("Second parameter should be of type boolean. Found " +
                     attributeExpressionExecutors[1].getReturnType() +
                     ".\nUsage: findNameEntityType(entityType:string, " +
