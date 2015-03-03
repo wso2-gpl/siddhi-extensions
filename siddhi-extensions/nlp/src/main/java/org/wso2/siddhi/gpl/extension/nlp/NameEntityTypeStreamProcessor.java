@@ -1,3 +1,17 @@
+/*
+ * Copyright (c) 2005 - 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy
+ * of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
 package org.wso2.siddhi.gpl.extension.nlp;
 
 import edu.stanford.nlp.ling.CoreAnnotations;
@@ -10,9 +24,10 @@ import org.wso2.siddhi.core.config.ExecutionPlanContext;
 import org.wso2.siddhi.core.event.ComplexEventChunk;
 import org.wso2.siddhi.core.event.stream.StreamEvent;
 import org.wso2.siddhi.core.event.stream.StreamEventCloner;
-import org.wso2.siddhi.core.event.stream.populater.StreamEventPopulater;
+import org.wso2.siddhi.core.event.stream.populater.ComplexEventPopulater;
 import org.wso2.siddhi.core.exception.ExecutionPlanCreationException;
 import org.wso2.siddhi.core.executor.ExpressionExecutor;
+import org.wso2.siddhi.core.executor.VariableExpressionExecutor;
 import org.wso2.siddhi.core.query.processor.Processor;
 import org.wso2.siddhi.core.query.processor.stream.StreamProcessor;
 import org.wso2.siddhi.gpl.extension.nlp.utility.Constants;
@@ -24,14 +39,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
-/**
- * Created by malithi on 9/3/14.
- */
-public class FindNameEntityTypeStreamProcessor extends StreamProcessor {
+public class NameEntityTypeStreamProcessor extends StreamProcessor {
 
-    private static Logger logger = Logger.getLogger(FindNameEntityTypeStreamProcessor.class);
+    private static Logger logger = Logger.getLogger(NameEntityTypeStreamProcessor.class);
 
-    //private int[] inStreamParamPosition;
+    private int[] inStreamParamPosition;
     private Constants.EntityType entityType;
     private boolean groupSuccessiveEntities;
     private StanfordCoreNLP pipeline;
@@ -47,23 +59,25 @@ public class FindNameEntityTypeStreamProcessor extends StreamProcessor {
 
     @Override
     protected List<Attribute> init(AbstractDefinition abstractDefinition, ExpressionExecutor[] attributeExpressionExecutors, ExecutionPlanContext executionPlanContext) {
-        logger.debug("inputs: " + attributeExpressionExecutors.length);
-
         if (logger.isDebugEnabled()) {
             logger.debug("Initializing Query ...");
         }
 
-        if (attributeExpressionExecutors.length < 3) {
-            throw new ExecutionPlanCreationException("Query expects at least three parameters. Received only " + attributeExpressionExecutors
-                    .length + ".\nUsage: findNameEntityType(entityType:string, groupSuccessiveEntities:boolean, " +
-                    "text:string-variable)");
+        if (attributeExpressionLength < 3) {
+            throw new ExecutionPlanCreationException("Query expects at least three parameters. Received only " +
+                    attributeExpressionLength +
+                    ".\nUsage: #nlp:findNameEntityType(entityType:string, " +
+                    "groupSuccessiveEntities:boolean, text:string-variable)");
         }
+
         String entityTypeParam;
         try {
             entityTypeParam = (attributeExpressionExecutors[0]).execute(null).toString();
         } catch (ClassCastException e) {
             logger.error("Error in reading parameter entityType");
-            throw new ExecutionPlanCreationException("First parameter should be of type string. Found " + attributeExpressionExecutors[0].getReturnType() + ".\nUsage: findNameEntityType(entityType:string, " +
+            throw new ExecutionPlanCreationException("First parameter should be of type string. Found " +
+                    attributeExpressionExecutors[0].getReturnType() +
+                    ".\nUsage: findNameEntityType(entityType:string, " +
                     "groupSuccessiveEntities:boolean, text:string-variable)");
         }
 
@@ -76,11 +90,12 @@ public class FindNameEntityTypeStreamProcessor extends StreamProcessor {
         }
 
         try {
-            groupSuccessiveEntities = (Boolean)(attributeExpressionExecutors[1]).execute(null);
+            groupSuccessiveEntities = (Boolean) (attributeExpressionExecutors[1]).execute(null);
         } catch (ClassCastException e) {
             logger.error("Error in reading parameter groupSuccessiveEntities", e);
             throw new ExecutionPlanCreationException("Second parameter should be of type boolean. Found " +
-                    attributeExpressionExecutors[1].getReturnType() + ".\nUsage: findNameEntityType(entityType:string, " +
+                    attributeExpressionExecutors[1].getReturnType() +
+                    ".\nUsage: findNameEntityType(entityType:string, " +
                     "groupSuccessiveEntities:boolean, text:string-variable)");
         }
         if (logger.isDebugEnabled()) {
@@ -89,6 +104,14 @@ public class FindNameEntityTypeStreamProcessor extends StreamProcessor {
                     inputDefinition.getAttributeList()));
         }
 
+        if (!(attributeExpressionExecutors[2] instanceof VariableExpressionExecutor)) {
+            throw new ExecutionPlanCreationException("Third parameter should be a variable. Found " +
+                    attributeExpressionExecutors[2].getReturnType() +
+                    ".\nUsage: findNameEntityType(entityType:string, " +
+                    "groupSuccessiveEntities:boolean, text:string-variable)");
+        }
+        inStreamParamPosition = ((VariableExpressionExecutor) attributeExpressionExecutors[2]).getPosition();
+
         initPipeline();
         ArrayList<Attribute> attributes = new ArrayList<Attribute>(1);
         attributes.add(new Attribute("match", Attribute.Type.STRING));
@@ -96,31 +119,23 @@ public class FindNameEntityTypeStreamProcessor extends StreamProcessor {
     }
 
     @Override
-    protected void process(ComplexEventChunk complexEventChunk, Processor processor, StreamEventCloner streamEventCloner, StreamEventPopulater streamEventPopulater) {
-        ComplexEventChunk<StreamEvent> streamEventChunk = complexEventChunk;
-        while (complexEventChunk.hasNext()) {
+    protected void process(ComplexEventChunk<StreamEvent> streamEventChunk, Processor processor, StreamEventCloner streamEventCloner, ComplexEventPopulater complexEventPopulater) {
+        while (streamEventChunk.hasNext()) {
             StreamEvent event = streamEventChunk.next();
-
 
             if (logger.isDebugEnabled()) {
                 logger.debug(String.format("Event received. Entity Type:%s GroupSuccessiveEntities:%s " +
                         "Event:%s", entityType.name(), groupSuccessiveEntities, event));
             }
 
-            Object[] inStreamData = event.getOutputData();
-
             Annotation document = new Annotation(attributeExpressionExecutors[2].execute(event).toString());
             pipeline.annotate(document);
 
             StreamEvent newEvent = null;
-
             List<CoreMap> sentences = document.get(CoreAnnotations.SentencesAnnotation.class);
 
             if (groupSuccessiveEntities) {
                 String word;
-                String previousWord;
-                int previousEventIndex;
-                Object[] outStreamData = null;
                 boolean added = false;
 
                 for (CoreMap sentence : sentences) {
@@ -128,31 +143,14 @@ public class FindNameEntityTypeStreamProcessor extends StreamProcessor {
                         if (entityType.name().equals(token.get(CoreAnnotations.NamedEntityTagAnnotation.class))) {
                             word = token.get(CoreAnnotations.TextAnnotation.class);
                             if (added) {
-                                //previousEventIndex = transformedListEvent.getActiveEvents() - 1;
-                                //previousWord = (String) transformedListEvent.getEvent(previousEventIndex).getData0();
-                                //transformedListEvent.removeLast();
-
-                                previousWord = newEvent.toString();
-
-                                previousWord = previousWord.concat(" " + word);
-                                outStreamData[0] = previousWord;
-
-                                newEvent = streamEventCloner.copyStreamEvent(event);
-                                streamEventPopulater.populateStreamEvent(newEvent, outStreamData);
-                                streamEventChunk.insertBeforeCurrent(newEvent);
+                                word = newEvent.getAttribute(inStreamParamPosition).toString() + " " + word;
+                                complexEventPopulater.populateComplexEvent(newEvent, new Object[]{word});
                             } else {
-
-                                outStreamData = new Object[inStreamData.length + 1];
-                                outStreamData[0] = word;
-                                System.arraycopy(inStreamData, 0, outStreamData, 1, inStreamData.length);
-                                //StreamEvent temp = new StreamEvent();
-                                //transformedListEvent.add();
                                 newEvent = streamEventCloner.copyStreamEvent(event);
-                                streamEventPopulater.populateStreamEvent(newEvent, outStreamData);
+                                complexEventPopulater.populateComplexEvent(newEvent, new Object[]{word});
                                 streamEventChunk.insertBeforeCurrent(newEvent);
-
+                                added = true;
                             }
-                            added = true;
                         } else {
                             added = false;
                         }
@@ -163,20 +161,16 @@ public class FindNameEntityTypeStreamProcessor extends StreamProcessor {
                     for (CoreLabel token : sentence.get(CoreAnnotations.TokensAnnotation.class)) {
                         if (entityType.name().equals(token.get(CoreAnnotations.NamedEntityTagAnnotation.class))) {
                             String word = token.get(CoreAnnotations.TextAnnotation.class);
-                            Object[] outStreamData = new Object[inStreamData.length + 1];
-                            outStreamData[0] = word;
-                            System.arraycopy(inStreamData, 0, outStreamData, 1, inStreamData.length);
                             newEvent = streamEventCloner.copyStreamEvent(event);
-                            streamEventPopulater.populateStreamEvent(newEvent, outStreamData);
+                            complexEventPopulater.populateComplexEvent(newEvent, new Object[]{word});
                             streamEventChunk.insertBeforeCurrent(newEvent);
                         }
                     }
                 }
             }
-             streamEventChunk.remove();
+            streamEventChunk.remove();
         }
-
-        nextProcessor.process(complexEventChunk);
+        nextProcessor.process(streamEventChunk);
     }
 
     @Override

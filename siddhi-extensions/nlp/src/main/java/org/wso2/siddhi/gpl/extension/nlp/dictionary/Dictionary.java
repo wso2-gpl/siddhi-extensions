@@ -1,3 +1,17 @@
+/*
+ * Copyright (c) 2005 - 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy
+ * of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
 package org.wso2.siddhi.gpl.extension.nlp.dictionary;
 
 import org.apache.log4j.Logger;
@@ -11,6 +25,7 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -21,7 +36,7 @@ import java.util.Set;
 public class Dictionary {
     private static Logger logger = Logger.getLogger(Dictionary.class);
 
-    private HashMap<String,Set<String>> store;
+    private HashMap<String, ArrayList<String>> store;
     private Constants.EntityType entityType;
     private String xmlFilePath;
 
@@ -31,19 +46,19 @@ public class Dictionary {
     public Dictionary(Constants.EntityType entityType, String xmlFilePath) throws Exception {
         this.entityType = entityType;
         this.xmlFilePath = xmlFilePath;
-        this.store = new HashMap<String, Set<String>>();
+        this.store = new HashMap<String, ArrayList<String>>();
 
         init();
     }
 
     private void init() throws Exception {
         File xmlFile = new File(xmlFilePath);
-        if(!xmlFile.canRead()){
+        if (!xmlFile.canRead()) {
             logger.error("Cannot read the given Dictionary file " + xmlFilePath);
             throw new RuntimeException("Cannot read the XML file : " + xmlFilePath);
         }
 
-        URL xsdFileUrl= this.getClass().getClassLoader().getResource(xsdFilePath);
+        URL xsdFileUrl = this.getClass().getClassLoader().getResource(xsdFilePath);
 
         Schema schema;
         SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
@@ -55,7 +70,7 @@ public class Dictionary {
             throw e;
         }
 
-        DictionaryHandler dictionaryHandler = new DictionaryHandler(entityType,this);
+        DictionaryHandler dictionaryHandler = new DictionaryHandler(entityType, this);
 
         SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
         saxParserFactory.setValidating(true);
@@ -73,23 +88,22 @@ public class Dictionary {
         }
     }
 
-    public boolean addEntry(Constants.EntityType entityType, String entry){
+    public boolean addEntry(Constants.EntityType entityType, String entry) {
 
         return getEntries(entityType).add(entry);
     }
 
-    public boolean removeEntry(Constants.EntityType entityType, String entry){
+    public boolean removeEntry(Constants.EntityType entityType, String entry) {
 
         return getEntries(entityType).remove(entry);
     }
 
-    public Set<String> getEntries(Constants.EntityType entityType){
-        Set<String> entries = store.get(entityType.name());
-        if(entries == null){
-            entries = new HashSet<String>();
-            store.put(entityType.name(),entries);
+    public synchronized ArrayList<String> getEntries(Constants.EntityType entityType) {
+        ArrayList<String> entries = store.get(entityType.name());
+        if (entries == null) {
+            entries = new ArrayList<String>();
+            store.put(entityType.name(), entries);
         }
-
         return entries;
     }
 
