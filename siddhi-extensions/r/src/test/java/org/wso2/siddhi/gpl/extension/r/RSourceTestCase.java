@@ -47,11 +47,11 @@ public class RSourceTestCase {
     // get double values to the output stream
     @Test
     public void testRSource1() throws InterruptedException {
-        log.info("R:runSource test1");
+        log.info("R:evalSource test1");
         String defineStream = "@config(async = 'true') define stream weather (time long, temp double); ";
 
         String executionPlan = defineStream + " @info(name = 'query1') from weather#window.timeBatch(1 sec)" +
-                "#R:runSource(\"src/test/resources/sample.R\", \"m double, c long\"," +
+                "#R:evalSource(\"src/test/resources/sample.R\", \"m double, c long\"," +
                 " time, temp)" +
                 " select *" +
                 " insert into dataOut;";
@@ -87,11 +87,11 @@ public class RSourceTestCase {
     // get integer, float values to the output stream
     @Test
     public void testRSource2() throws InterruptedException {
-        log.info("R:runSource test2");
+        log.info("R:evalSource test2");
         String defineStream = "@config(async = 'true') define stream weather (time long, temp double); ";
 
         String executionPlan = defineStream + " @info(name = 'query1') from weather#window.lengthBatch(2)" +
-                "#R:runSource(\"src/test/resources/sample2.R\", \"m int, c float\"," +
+                "#R:evalSource(\"src/test/resources/sample2.R\", \"m int, c float\"," +
                 " time, temp)" +
                 " select *" +
                 " insert into dataOut;";
@@ -127,11 +127,11 @@ public class RSourceTestCase {
     // get string, bool to the output stream
     @Test
     public void testRSource3() throws InterruptedException {
-        log.info("R:runSource test2");
+        log.info("R:evalSource test3");
         String defineStream = "@config(async = 'true') define stream weather (time long, temp double); ";
 
         String executionPlan = defineStream + " @info(name = 'query1') from weather#window.lengthBatch(2)" +
-                "#R:runSource(\"src/test/resources/sample3.R\", \"c string, m bool\"," +
+                "#R:evalSource(\"src/test/resources/sample3.R\", \"c string, m bool\"," +
                 " time, temp)" +
                 " select *" +
                 " insert into dataOut;";

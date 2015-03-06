@@ -29,9 +29,10 @@ public class RScriptStreamProcessor extends RStreamProcessor {
     @Override
     protected List<Attribute> init(AbstractDefinition abstractDefinition, ExpressionExecutor[] expressionExecutors, ExecutionPlanContext executionPlanContext) {
 
-        if (attributeExpressionExecutors.length < 3) {
-            throw new ExecutionPlanCreationException("Wrong number attributes given. Expected 3 or more, found " +
-                    attributeExpressionLength);
+        if (attributeExpressionExecutors.length < 2) {
+            throw new ExecutionPlanCreationException("Wrong number of attributes given. Expected 2 or more, found " +
+                    attributeExpressionLength+ "\n" +
+                    "Usage: #R:eval(script:string, outputVariables:string, input1, ...)");
         }
         String scriptString;
         String outputString;
@@ -44,7 +45,7 @@ public class RScriptStreamProcessor extends RStreamProcessor {
         } catch (ClassCastException e) {
             throw new ExecutionPlanCreationException("First parameter should be of type string. Found " +
                     attributeExpressionExecutors[0].execute(null).getClass().getCanonicalName() + "\n" +
-                    "Usage: #r:runScript(script:string, outputVariables:string)");
+                    "Usage: #R:eval(script:string, outputVariables:string, input1, ...)");
         }
         try {
             if (!(attributeExpressionExecutors[1] instanceof ConstantExpressionExecutor)) {
@@ -54,7 +55,7 @@ public class RScriptStreamProcessor extends RStreamProcessor {
         } catch (ClassCastException e) {
             throw new ExecutionPlanCreationException("Second parameter should be of type string. Found " +
                     attributeExpressionExecutors[1].execute(null).getClass().getCanonicalName() + "\n" +
-                    "Usage: #r:runScript(script:string, outputVariables:string)");
+                    "Usage: #R:eval(script:string, outputVariables:string, input1, ...)");
         }
 
         for (int i = 2; i < attributeExpressionLength; i++) {

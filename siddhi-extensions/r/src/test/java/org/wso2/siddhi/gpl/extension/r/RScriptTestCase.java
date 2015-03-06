@@ -45,12 +45,12 @@ public class RScriptTestCase {
 
     @Test
     public void testRScript1() throws InterruptedException {
-        log.info("R:runScript test1");
+        log.info("R:eval test1");
 
         String defineStream = "@config(async = 'true') define stream weather (time long, temp double); ";
 
         String executionPlan = defineStream + " @info(name = 'query1') from weather#window.lengthBatch(2)" +
-                "#R:runScript(\"c <- sum(time); m <- sum(temp); \", \"c long, m double\"," +
+                "#R:eval(\"c <- sum(time); m <- sum(temp); \", \"c long, m double\"," +
                 " time, temp)" +
                 " select *" +
                 " insert into dataOut;";
@@ -83,11 +83,11 @@ public class RScriptTestCase {
 
     @Test
     public void testRScript2() throws InterruptedException {
-        log.info("R:runScript test2");
+        log.info("R:eval test2");
         String defineStream = "@config(async = 'true') define stream weather (time int, temp double); ";
 
         String executionPlan = defineStream + " @info(name = 'query1') from weather#window.timeBatch(2 sec)" +
-                "#R:runScript(\"c <- sum(time); m <- sum(temp); \", \"c int, m double\"," +
+                "#R:eval(\"c <- sum(time); m <- sum(temp); \", \"c int, m double\"," +
                 " time, temp)" +
                 " select *" +
                 " insert into dataOut;";
@@ -123,11 +123,11 @@ public class RScriptTestCase {
 
     @Test
     public void testRScript3() throws InterruptedException {
-        log.info("R:runScript test3");
+        log.info("R:eval test3");
         String defineStream = "@config(async = 'true') define stream weather (time int, temp bool); ";
 
         String executionPlan = defineStream + " @info(name = 'query1') from weather#window.lengthBatch(3)" +
-                "#R:runScript(\"c <- sum(time); m <- any(temp); \", \"c double, m bool\"," +
+                "#R:eval(\"c <- sum(time); m <- any(temp); \", \"c double, m bool\"," +
                 " time, temp)" +
                 " select *" +
                 " insert into dataOut;";
