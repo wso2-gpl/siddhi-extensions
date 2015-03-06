@@ -16,167 +16,151 @@
 package org.wso2.siddhi.gpl.extension.r;
 
 import junit.framework.Assert;
+import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.wso2.siddhi.core.ExecutionPlanRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.query.output.callback.QueryCallback;
 import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.core.util.EventPrinter;
-import org.wso2.siddhi.query.api.QueryFactory;
-import org.wso2.siddhi.query.api.definition.Attribute;
-import org.wso2.siddhi.query.api.expression.Expression;
-import org.wso2.siddhi.query.api.query.Query;
-import org.wso2.siddhi.query.api.query.output.stream.OutStream;
 
-public class RSourceTestCase extends RTransformTestCase {
+public class RSourceTestCase {
 
-	private int count;
-	protected double value1;
-	protected double value2;
-	protected boolean valueBool;
-	protected String valueString;
-	protected float valueFloat;
-	protected long valueLong;
+    static final Logger log = Logger.getLogger(RSourceTestCase.class);
 
-	@Before
-	public void init() {
-		count = 0;
-	}
+    protected static SiddhiManager siddhiManager = new SiddhiManager();
+    private int count;
+    protected double value1;
+    protected double value2;
+    protected boolean valueBool;
+    protected String valueString;
+    protected float valueFloat;
+    protected long valueLong;
 
-	// get double values to the output stream
-	@Test
-	public void testRScript1() throws InterruptedException {
-		log.info("R:runScript test1");
-		SiddhiManager siddhiManager = new SiddhiManager(siddhiConfiguration);
-		siddhiManager.defineStream(QueryFactory.createStreamDefinition().name("weather")
-		                                       .attribute("time", Attribute.Type.LONG)
-		                                       .attribute("temp", Attribute.Type.DOUBLE));
+    @Before
+    public void init() {
+        count = 0;
+    }
 
-		Query query = QueryFactory.createQuery();
-		query.from(QueryFactory.inputStream("weather")
-		                       .transform("R", "runSource",
-		                                  Expression.value("src/test/resources/sample.R"),
-		                                  Expression.value("1s"),
-		                                  Expression.value("m double, c long")));
-		query.select(QueryFactory.outputSelector().select("m", Expression.variable("m"))
-		                         .select("c", Expression.variable("c")));
-		query.insertInto("weatherOutput", OutStream.OutputEventsFor.ALL_EVENTS);
+    // get double values to the output stream
+    @Test
+    public void testRSource1() throws InterruptedException {
+        log.info("R:runSource test1");
+        String defineStream = "@config(async = 'true') define stream weather (time long, temp double); ";
 
-		String queryReference = siddhiManager.addQuery(query);
-		siddhiManager.addCallback(queryReference, new QueryCallback() {
-			@Override
-			public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
-				EventPrinter.print(timeStamp, inEvents, removeEvents);
-				if (inEvents != null) {
-					for (Event event : inEvents) {
-						value1 = (Double) event.getData0();
-						valueLong = (Long) event.getData1();
-					}
-					count++;
-				}
-			}
-		});
+        String executionPlan = defineStream + " @info(name = 'query1') from weather#window.timeBatch(1 sec)" +
+                "#R:runSource(\"src/test/resources/sample.R\", \"m double, c long\"," +
+                " time, temp)" +
+                " select *" +
+                " insert into dataOut;";
+        ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(executionPlan);
 
-		InputHandler inputHandler = siddhiManager.getInputHandler("weather");
-		inputHandler.send(new Object[] { 10l, 55.6d });
-		Thread.sleep(2000);
-		inputHandler.send(new Object[] { 20l, 65.6d });
-		Thread.sleep(1000);
-		Assert.assertEquals("Only one event must arrive", 1, count);
-		Assert.assertEquals("Value 1 returned", 121.2, value1, 1e-4);
-		Assert.assertEquals("Value 2 returned", 30l, valueLong, 1e-4);
-		siddhiManager.shutdown();
-	}
+        executionPlanRuntime.addCallback("query1", new QueryCallback() {
+            @Override
+            public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
+                EventPrinter.print(timeStamp, inEvents, removeEvents);
+                if (inEvents != null) {
+                    for (Event event : inEvents) {
+                        value1 = (Double) event.getData(2);
+                        valueLong = (Long) event.getData(3);
+                    }
+                    count++;
+                }
+            }
+        });
 
-	// get integer, float values to the output stream
-	@Test
-	public void testRScript2() throws InterruptedException {
-		log.info("R:runScript test2");
-		SiddhiManager siddhiManager = new SiddhiManager(siddhiConfiguration);
-		siddhiManager.defineStream(QueryFactory.createStreamDefinition().name("weather")
-		                                       .attribute("time", Attribute.Type.LONG)
-		                                       .attribute("temp", Attribute.Type.DOUBLE));
+        executionPlanRuntime.start();
+        InputHandler inputHandler = executionPlanRuntime.getInputHandler("weather");
+        inputHandler.send(new Object[]{10l, 55.6d});
+        inputHandler.send(new Object[]{20l, 65.6d});
+        Thread.sleep(2000);
+        inputHandler.send(new Object[]{30l, 75.6d});
+        Thread.sleep(500);
+        Assert.assertEquals("Only one event must arrive", 1, count);
+        Assert.assertEquals("Value 1 returned", 121.2, value1, 1e-4);
+        Assert.assertEquals("Value 2 returned", 30l, valueLong, 1e-4);
+        executionPlanRuntime.shutdown();
+    }
 
-		Query query = QueryFactory.createQuery();
-		query.from(QueryFactory.inputStream("weather")
-		                       .transform("R", "runSource",
-		                                  Expression.value("src/test/resources/sample2.R"),
-		                                  Expression.value("2"), Expression.value("m int, c float")));
-		query.select(QueryFactory.outputSelector().select("m", Expression.variable("m"))
-		                         .select("c", Expression.variable("c")));
-		query.insertInto("weatherOutput", OutStream.OutputEventsFor.ALL_EVENTS);
+    // get integer, float values to the output stream
+    @Test
+    public void testRSource2() throws InterruptedException {
+        log.info("R:runSource test2");
+        String defineStream = "@config(async = 'true') define stream weather (time long, temp double); ";
 
-		String queryReference = siddhiManager.addQuery(query);
-		siddhiManager.addCallback(queryReference, new QueryCallback() {
-			@Override
-			public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
-				EventPrinter.print(timeStamp, inEvents, removeEvents);
-				if (inEvents != null) {
+        String executionPlan = defineStream + " @info(name = 'query1') from weather#window.lengthBatch(2)" +
+                "#R:runSource(\"src/test/resources/sample2.R\", \"m int, c float\"," +
+                " time, temp)" +
+                " select *" +
+                " insert into dataOut;";
+        ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(executionPlan);
 
-					for (Event event : inEvents) {
-						value1 = (Integer) event.getData0();
-						valueFloat = (Float) event.getData1();
-					}
-					count++;
-				}
-			}
-		});
+        executionPlanRuntime.addCallback("query1", new QueryCallback() {
+            @Override
+            public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
+                EventPrinter.print(timeStamp, inEvents, removeEvents);
+                if (inEvents != null) {
 
-		InputHandler inputHandler = siddhiManager.getInputHandler("weather");
-		inputHandler.send(new Object[] { 10l, 55.6d });
-		inputHandler.send(new Object[] { 20l, 65.6d });
-		inputHandler.send(new Object[] { 30l, 75.6d });
-		Thread.sleep(1000);
-		Assert.assertEquals("Only one event must arrive", 1, count);
-		Assert.assertEquals("Value 1 returned", 121, value1, 1e-4);
-		Assert.assertEquals("Value 2 returned", 30f, valueFloat);
-		siddhiManager.shutdown();
-	}
+                    for (Event event : inEvents) {
+                        value1 = (Integer) event.getData(2);
+                        valueFloat = (Float) event.getData(3);
+                    }
+                    count++;
+                }
+            }
+        });
 
-	// get string, bool to the output stream
-	@Test
-	public void testRScript3() throws InterruptedException {
-		log.info("R:runScript test2");
-		SiddhiManager siddhiManager = new SiddhiManager(siddhiConfiguration);
-		siddhiManager.defineStream(QueryFactory.createStreamDefinition().name("weather")
-		                                       .attribute("time", Attribute.Type.LONG)
-		                                       .attribute("temp", Attribute.Type.DOUBLE));
+        executionPlanRuntime.start();
+        InputHandler inputHandler = executionPlanRuntime.getInputHandler("weather");
+        inputHandler.send(new Object[]{10l, 55.6d});
+        inputHandler.send(new Object[]{20l, 65.6d});
+        inputHandler.send(new Object[]{30l, 75.6d});
+        Thread.sleep(1000);
+        Assert.assertEquals("Only one event must arrive", 1, count);
+        Assert.assertEquals("Value 1 returned", 121, value1, 1e-4);
+        Assert.assertEquals("Value 2 returned", 30f, valueFloat);
+        executionPlanRuntime.shutdown();
+    }
 
-		Query query = QueryFactory.createQuery();
-		query.from(QueryFactory.inputStream("weather")
-		                       .transform("R", "runSource",
-		                                  Expression.value("src/test/resources/sample3.R"),
-		                                  Expression.value("2"),
-		                                  Expression.value("c string, m bool")));
-		query.select(QueryFactory.outputSelector().select("c", Expression.variable("c"))
-		                         .select("m", Expression.variable("m")));
-		query.insertInto("weatherOutput", OutStream.OutputEventsFor.ALL_EVENTS);
+    // get string, bool to the output stream
+    @Test
+    public void testRSource3() throws InterruptedException {
+        log.info("R:runSource test2");
+        String defineStream = "@config(async = 'true') define stream weather (time long, temp double); ";
 
-		String queryReference = siddhiManager.addQuery(query);
-		siddhiManager.addCallback(queryReference, new QueryCallback() {
-			@Override
-			public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
-				EventPrinter.print(timeStamp, inEvents, removeEvents);
-				if (inEvents != null) {
+        String executionPlan = defineStream + " @info(name = 'query1') from weather#window.lengthBatch(2)" +
+                "#R:runSource(\"src/test/resources/sample3.R\", \"c string, m bool\"," +
+                " time, temp)" +
+                " select *" +
+                " insert into dataOut;";
+        ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(executionPlan);
 
-					for (Event event : inEvents) {
-						valueString = event.getData0().toString();
-						valueBool = (Boolean) event.getData1();
-					}
-					count++;
-				}
-			}
-		});
+        executionPlanRuntime.addCallback("query1", new QueryCallback() {
+            @Override
+            public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
+                EventPrinter.print(timeStamp, inEvents, removeEvents);
+                if (inEvents != null) {
 
-		InputHandler inputHandler = siddhiManager.getInputHandler("weather");
-		inputHandler.send(new Object[] { 123l, 55.6d });
-		inputHandler.send(new Object[] { 101l, 72.3d });
-		Thread.sleep(1000);
-		Assert.assertEquals("Only one event must arrive", 1, count);
-		Assert.assertEquals("Value 1 returned", "178.6", valueString);
-		Assert.assertEquals("Value 2 returned", true, valueBool);
-		siddhiManager.shutdown();
-	}
+                    for (Event event : inEvents) {
+                        valueString = (String) event.getData(2);
+                        valueBool = (Boolean) event.getData(3);
+                    }
+                    count++;
+                }
+            }
+        });
+
+        executionPlanRuntime.start();
+        InputHandler inputHandler = executionPlanRuntime.getInputHandler("weather");
+        inputHandler.send(new Object[]{123l, 55.6d});
+        inputHandler.send(new Object[]{101l, 72.3d});
+        Thread.sleep(1000);
+        Assert.assertEquals("Only one event must arrive", 1, count);
+        Assert.assertEquals("Value 1 returned", "178.6", valueString);
+        Assert.assertEquals("Value 2 returned", true, valueBool);
+        executionPlanRuntime.shutdown();
+    }
 
 }

@@ -12,5 +12,5 @@
 # CONDITIONS OF ANY KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations under the License.
 #
-runSource=org.wso2.siddhi.gpl.extension.r.rSourceStreamProcessor
-runScript=org.wso2.siddhi.gpl.extension.r.rScriptStreamProcessor
+runSource=org.wso2.siddhi.gpl.extension.r.RSourceStreamProcessor
+runScript=org.wso2.siddhi.gpl.extension.r.RScriptStreamProcessor

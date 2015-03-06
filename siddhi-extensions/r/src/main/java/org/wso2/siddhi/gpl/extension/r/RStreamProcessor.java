@@ -38,7 +38,6 @@ import java.util.List;
 
 public abstract class RStreamProcessor extends StreamProcessor {
 
-    List<StreamEvent> eventList = new ArrayList<StreamEvent>();
     List<Attribute> inputAttributes = new ArrayList<Attribute>();
 
     REXP outputs;
@@ -47,15 +46,28 @@ public abstract class RStreamProcessor extends StreamProcessor {
 
     REngine re;
     static Logger log = Logger.getLogger(RStreamProcessor.class);
+
     @Override
     protected void process(ComplexEventChunk<StreamEvent> complexEventChunk, Processor processor, StreamEventCloner streamEventCloner, ComplexEventPopulater complexEventPopulater) {
         StreamEvent streamEvent;
+        StreamEvent lastCurrentEvent = null;
+        List<StreamEvent> eventList = new ArrayList<StreamEvent>();
         while (complexEventChunk.hasNext()) {
             streamEvent = complexEventChunk.next();
-            if (streamEvent.getType() == ComplexEvent.Type.EXPIRED) {
+            if (streamEvent.getType() == ComplexEvent.Type.CURRENT) {
                 eventList.add(streamEvent);
+                lastCurrentEvent = streamEvent;
+                complexEventChunk.remove();
             }
         }
+        if(!eventList.isEmpty()) {
+            complexEventPopulater.populateComplexEvent(lastCurrentEvent, process(eventList));
+            complexEventChunk.add(lastCurrentEvent);
+        }
+        nextProcessor.process(complexEventChunk);
+    }
+
+    private Object[] process(List<StreamEvent> eventList) {
         try {
             REXP eventData;
             ExpressionExecutor expressionExecutor;
@@ -83,7 +95,7 @@ public abstract class RStreamProcessor extends StreamProcessor {
                     default:
                         continue;
                 }
-                re.assign(inputAttributes.get(j).getName(), eventData, env);
+                re.assign(inputAttributes.get(j - 2).getName(), eventData, env);
             }
             re.eval(script, env, false);
         } catch (Exception e) {
@@ -133,15 +145,13 @@ public abstract class RStreamProcessor extends StreamProcessor {
                                 result.asNativeJavaObject().getClass().getCanonicalName());
                 }
             }
+            return data;
         } catch (Exception e) {
             throw new ExecutionPlanRuntimeException("Mismatch in returned output and expected output", e);
         }
     }
 
-
-
     protected List<Attribute> initialize(String scriptString, String outputString) {
-
         try {
             // Get the JRIEngine or create one
             re = JRIEngine.createEngine();
