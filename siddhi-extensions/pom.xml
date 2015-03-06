@@ -17,6 +17,7 @@
         <!--<module>nlp</module>-->
         <!--<module>geo</module>-->
         <!--<module>r</module>-->
+        <!--<module>eval-script</module>-->
     </modules>
 
 </project>
