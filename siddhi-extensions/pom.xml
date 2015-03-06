@@ -16,6 +16,7 @@
     <modules>
         <!--<module>nlp</module>-->
         <!--<module>geo</module>-->
+        <!--<module>r</module>-->
     </modules>
 
 </project>
