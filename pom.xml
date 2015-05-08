@@ -198,13 +198,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <!--<scm>-->
-    <!--<connection>scm:svn:http://svn.wso2.org/repos/wso2/trunk/commons/siddhi</connection>-->
-    <!--<developerConnection>scm:svn:https://svn.wso2.org/repos/wso2/trunk/commons/siddhi-->
-    <!--</developerConnection>-->
-    <!--<url>http://svn.wso2.org/repos/wso2/trunk/commons/siddhi</url>-->
-    <!--</scm>-->
-
     <mailingLists>
         <mailingList>
             <name>Architecture</name>
@@ -215,67 +208,5 @@
             </archive>
         </mailingList>
     </mailingLists>
-
-    <repositories>
-        <repository>
-            <id>Stanford-nexus</id>
-            <name>Stanford internal Repository</name>
-            <url>http://mu.lti.cs.cmu.edu:8081/nexus/content/groups/public/</url>
-            <!--<releases>-->
-            <!--<enabled>true</enabled>-->
-            <!--<updatePolicy>daily</updatePolicy>-->
-            <!--<checksumPolicy>ignore</checksumPolicy>-->
-            <!--</releases>-->
-        </repository>
-
-        <repository>
-            <id>wso2-nexus</id>
-            <name>WSO2 internal Repository</name>
-            <url>http://maven.wso2.org/nexus/content/groups/wso2-public/</url>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>daily</updatePolicy>
-                <checksumPolicy>ignore</checksumPolicy>
-            </releases>
-        </repository>
-
-        <repository>
-            <id>wso2.releases</id>
-            <name>WSO2 internal Repository</name>
-            <url>http://maven.wso2.org/nexus/content/repositories/releases/</url>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>daily</updatePolicy>
-                <checksumPolicy>ignore</checksumPolicy>
-            </releases>
-        </repository>
-
-        <repository>
-            <id>wso2.snapshots</id>
-            <name>Apache Snapshot Repository</name>
-            <url>http://maven.wso2.org/nexus/content/repositories/snapshots/</url>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>daily</updatePolicy>
-            </snapshots>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </repository>
-    </repositories>
-
-    <distributionManagement>
-        <repository>
-            <id>wso2.releases</id>
-            <name>WSO2 internal Repository</name>
-            <url>http://maven.wso2.org/nexus/content/repositories/releases/</url>
-        </repository>
-
-        <snapshotRepository>
-            <id>wso2.snapshots</id>
-            <name>WSO2 Snapshot Repository</name>
-            <url>http://maven.wso2.org/nexus/content/repositories/snapshots/</url>
-        </snapshotRepository>
-    </distributionManagement>
 
 </project>

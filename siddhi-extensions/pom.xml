@@ -14,9 +14,11 @@
     <name>Siddhi Extensions</name>
 
     <modules>
+        <!--<module>nlp/stanford-tregex-installer</module>-->
+        <!--<module>nlp/stanford-nlp</module>-->
         <!--<module>nlp</module>-->
-        <!--<module>geo</module>-->
-        <!--<module>r</module>-->
+        <module>geo</module>
+        <module>r</module>
         <!--<module>eval-script</module>-->
     </modules>
 

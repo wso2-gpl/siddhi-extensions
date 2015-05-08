@@ -26,6 +26,8 @@ import org.wso2.siddhi.core.query.output.callback.QueryCallback;
 import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.core.util.EventPrinter;
 
+import static org.junit.Assume.assumeTrue;
+
 public class RScriptTestCase {
 
     static final Logger log = Logger.getLogger(RScriptTestCase.class);
@@ -45,12 +47,13 @@ public class RScriptTestCase {
 
     @Test
     public void testRScript1() throws InterruptedException {
-        log.info("R:eval test1");
+        log.info("r:eval test1");
+        assumeTrue(System.getenv("JRI_HOME")!=null);
 
         String defineStream = "@config(async = 'true') define stream weather (time long, temp double); ";
 
         String executionPlan = defineStream + " @info(name = 'query1') from weather#window.lengthBatch(2)" +
-                "#R:eval(\"c <- sum(time); m <- sum(temp); \", \"c long, m double\"," +
+                "#r:eval(\"c <- sum(time); m <- sum(temp); \", \"c long, m double\"," +
                 " time, temp)" +
                 " select *" +
                 " insert into dataOut;";
@@ -83,11 +86,12 @@ public class RScriptTestCase {
 
     @Test
     public void testRScript2() throws InterruptedException {
-        log.info("R:eval test2");
+        log.info("r:eval test2");
+        assumeTrue(System.getenv("JRI_HOME") != null);
         String defineStream = "@config(async = 'true') define stream weather (time int, temp double); ";
 
         String executionPlan = defineStream + " @info(name = 'query1') from weather#window.timeBatch(2 sec)" +
-                "#R:eval(\"c <- sum(time); m <- sum(temp); \", \"c int, m double\"," +
+                "#r:eval(\"c <- sum(time); m <- sum(temp); \", \"c int, m double\"," +
                 " time, temp)" +
                 " select *" +
                 " insert into dataOut;";
@@ -123,11 +127,13 @@ public class RScriptTestCase {
 
     @Test
     public void testRScript3() throws InterruptedException {
-        log.info("R:eval test3");
+        log.info("r:eval test3");
+        assumeTrue(System.getenv("JRI_HOME") != null);
+
         String defineStream = "@config(async = 'true') define stream weather (time int, temp bool); ";
 
         String executionPlan = defineStream + " @info(name = 'query1') from weather#window.lengthBatch(3)" +
-                "#R:eval(\"c <- sum(time); m <- any(temp); \", \"c double, m bool\"," +
+                "#r:eval(\"c <- sum(time); m <- any(temp); \", \"c double, m bool\"," +
                 " time, temp)" +
                 " select *" +
                 " insert into dataOut;";
