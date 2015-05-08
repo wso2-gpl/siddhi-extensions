@@ -84,43 +84,13 @@
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>2.2.4</version>
         </dependency>
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-geojson</artifactId>
-            <version>${geotools.version}</version>
         </dependency>
     </dependencies>
-    <properties>
-        <geotools.version>13-RC1</geotools.version>
-    </properties>
 
-    <repositories>
-        <repository>
-            <id>wso2-maven2-repository</id>
-            <name>WSO2 Maven2 Repository</name>
-            <url>http://dist.wso2.org/maven2</url>
-        </repository>
-        <repository>
-            <id>maven2-repository.dev.java.net</id>
-            <name>Java.net repository</name>
-            <url>http://download.java.net/maven/2</url>
-        </repository>
-        <repository>
-            <id>osgeo</id>
-            <name>Open Source Geospatial Foundation Repository</name>
-            <url>http://download.osgeo.org/webdav/geotools/</url>
-        </repository>
-        <repository>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <id>opengeo</id>
-            <name>OpenGeo Maven Repository</name>
-            <url>http://repo.opengeo.org</url>
-        </repository>
-    </repositories>
     <build>
         <plugins>
             <plugin>
@@ -131,13 +101,14 @@
                 <configuration>
                     <instructions>
                         <Export-Package>
-                            com.vividsolutions.*,org.jdom.*,
-                            javax.media.*,org.geotools.*,org.wso2.cep.*,
-                            org.wso2.siddhi.gpl.extensions.geo.stream.*;
-                            org.wso2.siddhi.gpl.extensions.geo.function.*;
+                            com.vividsolutions.*,
+                            org.jdom.*,
+                            javax.media.*,
+                            org.geotools.*;-split-package:=merge-last,
+                            org.wso2.siddhi.gpl.extensions.geo.*
                         </Export-Package>
                         <Private-Package>
-                            org.wso2.siddhi.gpl.extensions.geo.internal.util.*;
+                            org.wso2.siddhi.gpl.extensions.geo.internal.*
                         </Private-Package>
                         <Import-Package>
                             *;resolution:=optional

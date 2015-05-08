@@ -21,10 +21,12 @@ import org.junit.Test;
 import org.wso2.siddhi.core.ExecutionPlanRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.event.Event;
-import org.wso2.siddhi.core.function.exceptions.FunctionInitializationException;
 import org.wso2.siddhi.core.query.output.callback.QueryCallback;
 import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.core.util.EventPrinter;
+import org.wso2.siddhi.extension.evalscript.exceptions.FunctionInitializationException;
+
+import static org.junit.Assume.assumeTrue;
 
 public class EvalRTestCase {
 
@@ -35,8 +37,8 @@ public class EvalRTestCase {
 
     @Test
     public void testEvalRConcat() throws InterruptedException {
-
         log.info("TestEvalRConcat");
+        assumeTrue(System.getenv("JRI_HOME")!=null);
 
         SiddhiManager siddhiManager = new SiddhiManager();
 
@@ -77,8 +79,8 @@ public class EvalRTestCase {
 
     @Test(expected = FunctionInitializationException.class)
     public void testRCompilationFailure() throws InterruptedException {
-
         log.info("testRCompilationFailure");
+        assumeTrue(System.getenv("JRI_HOME")!=null);
 
         SiddhiManager siddhiManager = new SiddhiManager();
 
