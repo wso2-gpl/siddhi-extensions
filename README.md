@@ -1,6 +1,6 @@
 Siddhi CEP - GPL Extensions
 ==============================
-###  v2.2.0-SNAPSHOT 
+###  v3.0.0-SNAPSHOT
 
 Siddhi CEP - GPL Extensions are extensions written to Siddhi under GNU GENERAL PUBLIC LICENSE.
 
@@ -9,5 +9,6 @@ This project is based on Siddhi CEP (https://github.com/wso2/siddhi) which is a 
 Features Supported
 ------------------
  - Natural Language Processing
-    - 
- - Geo Fencing 
+ - Geo
+ - R
+ - Eval Script - R
