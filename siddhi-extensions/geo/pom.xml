@@ -6,15 +6,15 @@
         <artifactId>siddhi-extensions</artifactId>
         <groupId>org.wso2.siddhi.gpl</groupId>
         <version>3.0.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-
-    <groupId>org.wso2.siddhi.gpl.extensions</groupId>
-    <artifactId>geo</artifactId>
-
     <packaging>bundle</packaging>
+    <url>http://wso2.org</url>
 
-    <name>Siddhi Geo Extensions</name>
+    <artifactId>geo</artifactId>
+    <name>Siddhi Extension - Geo</name>
+
     <description>
         FunctionExecutors
         1.  GeoWithinFunctionExecutor
@@ -57,7 +57,6 @@
                      the pair of objects
 
     </description>
-    <url>http://wso2.org</url>
 
     <dependencies>
         <dependency>
