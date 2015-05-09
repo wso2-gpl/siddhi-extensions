@@ -42,15 +42,15 @@
 
     <licenses>
         <license>
-            <name>GNU General Public License (GPL)</name>
-            <url>http://www.gnu.org/licenses/gpl.txt</url>
+            <name>GNU General Public License version 3 (GPLv3)</name>
+            <url>http://www.gnu.org/licenses/gpl-3.0.txt</url>
         </license>
     </licenses>
 
     <scm>
-        <url>https://github.com/wso2/siddhi.git</url>
-        <developerConnection>scm:git:https://github.com/wso2/siddhi.git</developerConnection>
-        <connection>scm:git:https://github.com/wso2/siddhi.git</connection>
+        <url>https://github.com/wso2-gpl/siddhi.git</url>
+        <developerConnection>scm:git:https://github.com/wso2-gpl/siddhi.git</developerConnection>
+        <connection>scm:git:https://github.com/wso2-gpl/siddhi.git</connection>
         <tag>HEAD</tag>
     </scm>
 
