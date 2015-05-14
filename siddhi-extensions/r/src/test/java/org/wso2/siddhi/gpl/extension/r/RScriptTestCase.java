@@ -93,8 +93,7 @@ public class RScriptTestCase {
         String defineStream = "@config(async = 'true') define stream weather (time int, temp double); ";
 
         String executionPlan = defineStream + " @info(name = 'query1') from weather#window.timeBatch(2 sec)" +
-                "#r:eval(\"c <- sum(time); m <- sum(temp); \", \"c int, m double\"," +
-                " time, temp)" +
+                "#r:eval('c <- sum(time); m <- sum(temp); ', 'c int, m double', time, temp)" +
                 " select *" +
                 " insert into dataOut;";
         ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(executionPlan);
