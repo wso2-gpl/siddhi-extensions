@@ -130,9 +130,33 @@ public class PmmlModelProcessor extends StreamProcessor {
         inputFields = evaluator.getActiveFields();
         outputFields = evaluator.getOutputFields();
 
+        return generateOutputAttributes();
+    }
+
+    /**
+     * Generate the output attribute list
+     * @return
+     */
+    private List<Attribute> generateOutputAttributes() {
+
         List<Attribute> outputAttributes = new ArrayList<Attribute>();
-        for(FieldName fieldName : outputFields) {
-            outputAttributes.add(new Attribute(fieldName.getValue(), Attribute.Type.DOUBLE));
+        for(FieldName field : outputFields) {
+            String dataType = evaluator.getOutputField(field).getDataType().toString();
+            Attribute.Type type = null;
+            if (dataType.equalsIgnoreCase("double")) {
+                type = Attribute.Type.DOUBLE;
+            } else if (dataType.equalsIgnoreCase("float")) {
+                type = Attribute.Type.FLOAT;
+            } else if (dataType.equalsIgnoreCase("integer")) {
+                type = Attribute.Type.INT;
+            } else if (dataType.equalsIgnoreCase("long")) {
+                type = Attribute.Type.LONG;
+            } else if (dataType.equalsIgnoreCase("string")) {
+                type = Attribute.Type.STRING;
+            } else if (dataType.equalsIgnoreCase("boolean")) {
+                type = Attribute.Type.BOOL;
+            }
+            outputAttributes.add(new Attribute(field.getValue(), type));
         }
         return outputAttributes;
     }
