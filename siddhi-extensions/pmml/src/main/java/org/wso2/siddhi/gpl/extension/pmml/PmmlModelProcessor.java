@@ -16,6 +16,8 @@
 
 package org.wso2.siddhi.gpl.extension.pmml;
 
+import org.jpmml.evaluator.EvaluatorUtil;
+import org.jpmml.evaluator.FieldValue;
 import org.wso2.siddhi.core.config.ExecutionPlanContext;
 import org.wso2.siddhi.core.event.ComplexEventChunk;
 import org.wso2.siddhi.core.event.stream.StreamEvent;
@@ -46,10 +48,7 @@ import org.jpmml.model.JAXBUtil;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.StringReader;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.xml.transform.Source;
 
@@ -60,45 +59,52 @@ public class PmmlModelProcessor extends StreamProcessor {
 
     private String pmmlDefinition;
     private boolean attributeSelectionAvailable;
-    
-    //TODO: This should be a map of <feature_name, attribute_index>
-    private Map<Integer, Integer> attributeIndexMap;           // <feature-index, attribute-index> pairs
+    private Map<FieldName, Integer> attributeIndexMap;           // <feature-name, attribute-index> pairs
     
     private List<FieldName> inputFields;        // All the input fields defined in the pmml definition
     private List<FieldName> outputFields;       // Output fields of the pmml definition
+    private Evaluator evaluator;
 
     @Override
     protected void process(ComplexEventChunk<StreamEvent> streamEventChunk, Processor nextProcessor, StreamEventCloner streamEventCloner, ComplexEventPopulater complexEventPopulater) {
 
         StreamEvent event = streamEventChunk.getFirst();
+        Map<FieldName, FieldValue> inData = new HashMap<FieldName, FieldValue>();
 
-        /*Object[] data;
-        double[] featureValues;
+        Object[] data;
         if (attributeSelectionAvailable) {
             data = event.getBeforeWindowData();
-            featureValues = new double[data.length];
         } else {
             data = event.getOutputData();
-            featureValues = new double[data.length-1];
         }
 
-        for(Map.Entry<Integer, Integer> entry : attributeIndexMap.entrySet()) {
-            int featureIndex = entry.getKey();
-            int attributeIndex = entry.getValue();
-            featureValues[featureIndex] = Double.parseDouble(String.valueOf(data[attributeIndex]));
+        try {
+            for(Map.Entry<FieldName, Integer> entry : attributeIndexMap.entrySet()) {
+                FieldName featureName = entry.getKey();
+                int attributeIndex = entry.getValue();
+                inData.put(featureName, EvaluatorUtil.prepare(evaluator, featureName, String.valueOf(data[attributeIndex])));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-        if(featureValues != null) {
+        if(!inData.isEmpty()) {
             try {
-                double predictionResult = modelHandler.predict(featureValues);
-                Object[] output = new Object[]{predictionResult};
+                Map<FieldName, ?> result = evaluator.evaluate(inData);
+                Object[] output = new Object[result.size()];
+                int i = 0;
+                for (FieldName fieldName : result.keySet()) {
+                    output[i] = EvaluatorUtil.decode(result.get(fieldName));
+                    i++;
+                }
+
                 complexEventPopulater.populateComplexEvent(event, output);
                 nextProcessor.process(streamEventChunk);
             } catch (Exception e) {
                 log.error("Error while predicting", e);
                 throw new ExecutionPlanRuntimeException("Error while predicting" ,e);
             }
-        }*/
+        }
     }
 
     @Override
@@ -109,7 +115,7 @@ public class PmmlModelProcessor extends StreamProcessor {
         } else if(attributeExpressionExecutors.length == 1) {
             attributeSelectionAvailable = false;    // model-definition only
         } else {
-            attributeSelectionAvailable = true;  // model-definition and stream-attributes list
+            attributeSelectionAvailable = true;     // model-definition and stream-attributes list
         }
 
         // Check whether the first parameter in the expression is the pmml definition
@@ -125,34 +131,41 @@ public class PmmlModelProcessor extends StreamProcessor {
         // Get the different types of fields defined in the pmml model
         PMMLManager pmmlManager = new PMMLManager(pmmlModel);
         
-        Evaluator evaluator =(Evaluator) pmmlManager.getModelManager(ModelEvaluatorFactory.getInstance());
+        evaluator = (Evaluator) pmmlManager.getModelManager(ModelEvaluatorFactory.getInstance());
         inputFields = evaluator.getActiveFields();
         outputFields = evaluator.getOutputFields();
-        
-        return Arrays.asList(new Attribute(PREDICTION, Attribute.Type.DOUBLE));
+
+        // TODO here the new Attributes should be the output fields of pmml ?
+//        return Arrays.asList(new Attribute(PREDICTION, Attribute.Type.DOUBLE));
+        List<Attribute> outputAttributes = new ArrayList<Attribute>();
+        for(FieldName fieldName : outputFields) {
+            outputAttributes.add(new Attribute(fieldName.getValue(), Attribute.Type.DOUBLE));
+        }
+        return outputAttributes;
     }
 
     @Override
     public void start() {
-       /* try {
-            modelHandler = new ModelHandler(pmmlDefinition);
+        try {
             populateFeatureAttributeMapping();
         } catch (Exception e) {
-            log.error("Error while retrieving ML-model : " + pmmlDefinition, e);
-            throw new ExecutionPlanCreationException("Error while retrieving ML-model : " + pmmlDefinition + "\n" + e.getMessage());
-        }*/
+            log.error("Error while mapping attributes with pmml model features : " + pmmlDefinition, e);
+            throw new ExecutionPlanCreationException("Error while mapping attributes with pmml model features : " + pmmlDefinition + "\n" + e.getMessage());
+        }
     }
 
     /**
-     * Match the attribute index values of stream with feature index value of the model
+     * Match the attribute index values of stream with feature names of the model
      * @throws Exception
      */
     private void populateFeatureAttributeMapping() throws Exception {
-        
-        // TODO: Compare the siddhi parameters against the inputFields of pmml definition.
-        
-        attributeIndexMap = new HashMap<Integer, Integer>();
-        Map<String, Integer> featureIndexMap = modelHandler.getFeatures();
+
+        attributeIndexMap = new HashMap<FieldName, Integer>();
+        HashMap<String, FieldName> features = new HashMap<String, FieldName>();
+
+        for (FieldName fieldName : inputFields) {
+            features.put(fieldName.getValue(), fieldName);
+        }
 
         if(attributeSelectionAvailable) {
             int index = 0;
@@ -160,10 +173,9 @@ public class PmmlModelProcessor extends StreamProcessor {
                 if(expressionExecutor instanceof VariableExpressionExecutor) {
                     VariableExpressionExecutor variable = (VariableExpressionExecutor) expressionExecutor;
                     String variableName = variable.getAttribute().getName();
-                    if (featureIndexMap.get(variableName) != null) {
-                        int featureIndex = featureIndexMap.get(variableName);
+                    if (features.get(variableName) != null) {
                         int attributeIndex = index;
-                        attributeIndexMap.put(featureIndex, attributeIndex);
+                        attributeIndexMap.put(features.get(variableName), attributeIndex);
                     } else {
                         throw new ExecutionPlanCreationException("No matching feature name found in the model " +
                                 "for the attribute : " + variableName);
@@ -174,10 +186,9 @@ public class PmmlModelProcessor extends StreamProcessor {
         } else {
             String[] attributeNames = inputDefinition.getAttributeNameArray();
             for(String attributeName : attributeNames) {
-                if (featureIndexMap.get(attributeName) != null) {
-                    int featureIndex = featureIndexMap.get(attributeName);
+                if (features.get(attributeName) != null) {
                     int attributeIndex = inputDefinition.getAttributePosition(attributeName);
-                    attributeIndexMap.put(featureIndex, attributeIndex);
+                    attributeIndexMap.put(features.get(attributeName), attributeIndex);
                 } else {
                     throw new ExecutionPlanCreationException("No matching feature name found in the model " +
                             "for the attribute : " + attributeName);
@@ -208,7 +219,7 @@ public class PmmlModelProcessor extends StreamProcessor {
             return JAXBUtil.unmarshalPMML(source);
         } catch (Exception e) {
             logger.error("Failed to unmarshal the pmml definition: " + e.getMessage());
-            throw new ExecutionPlanCreationException("Failed to unmarshal the pmml definition: " + pmmlDefinition + ". " 
+            throw new ExecutionPlanCreationException("Failed to unmarshal the pmml definition: " + pmmlDefinition + ". "
                     + e.getMessage(), e);
         }
     }
