@@ -34,6 +34,7 @@
         <module>nlp</module>
         <module>geo</module>
         <module>r</module>
+        <module>pmml</module>
         <module>eval-script</module>
     </modules>
 
