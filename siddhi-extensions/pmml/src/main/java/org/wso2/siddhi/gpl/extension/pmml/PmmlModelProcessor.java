@@ -55,7 +55,6 @@ import javax.xml.transform.Source;
 public class PmmlModelProcessor extends StreamProcessor {
 
     private static final Log logger = LogFactory.getLog(PmmlModelProcessor.class);
-    private static final String PREDICTION = "prediction";
 
     private String pmmlDefinition;
     private boolean attributeSelectionAvailable;
@@ -135,8 +134,6 @@ public class PmmlModelProcessor extends StreamProcessor {
         inputFields = evaluator.getActiveFields();
         outputFields = evaluator.getOutputFields();
 
-        // TODO here the new Attributes should be the output fields of pmml ?
-//        return Arrays.asList(new Attribute(PREDICTION, Attribute.Type.DOUBLE));
         List<Attribute> outputAttributes = new ArrayList<Attribute>();
         for(FieldName fieldName : outputFields) {
             outputAttributes.add(new Attribute(fieldName.getValue(), Attribute.Type.DOUBLE));
