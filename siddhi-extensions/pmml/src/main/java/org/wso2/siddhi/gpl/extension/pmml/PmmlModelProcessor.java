@@ -77,14 +77,10 @@ public class PmmlModelProcessor extends StreamProcessor {
             data = event.getOutputData();
         }
 
-        try {
-            for(Map.Entry<FieldName, Integer> entry : attributeIndexMap.entrySet()) {
-                FieldName featureName = entry.getKey();
-                int attributeIndex = entry.getValue();
-                inData.put(featureName, EvaluatorUtil.prepare(evaluator, featureName, String.valueOf(data[attributeIndex])));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        for(Map.Entry<FieldName, Integer> entry : attributeIndexMap.entrySet()) {
+            FieldName featureName = entry.getKey();
+            int attributeIndex = entry.getValue();
+            inData.put(featureName, EvaluatorUtil.prepare(evaluator, featureName, String.valueOf(data[attributeIndex])));
         }
 
         if(!inData.isEmpty()) {
