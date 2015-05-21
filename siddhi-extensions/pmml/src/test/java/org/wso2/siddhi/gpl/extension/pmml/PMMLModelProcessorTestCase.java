@@ -63,7 +63,7 @@ public class PMMLModelProcessorTestCase {
                 EventPrinter.print(timeStamp, inEvents, removeEvents);
                 eventArrived = true;
                 if (inEvents != null) {
-                    Assert.assertEquals(0.018258426966292134, inEvents[0].getData(15));
+                    Assert.assertEquals("1", inEvents[0].getData(13));
                 }
             }
 
@@ -101,7 +101,7 @@ public class PMMLModelProcessorTestCase {
                 EventPrinter.print(timeStamp, inEvents, removeEvents);
                 eventArrived = true;
                 if (inEvents != null) {
-                    Assert.assertEquals(0.018258426966292134, inEvents[0].getData(2));
+                    Assert.assertEquals("1", inEvents[0].getData(0));
                 }
             }
 
