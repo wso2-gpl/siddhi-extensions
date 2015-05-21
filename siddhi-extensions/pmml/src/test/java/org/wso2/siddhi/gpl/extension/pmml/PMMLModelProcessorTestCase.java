@@ -77,41 +77,41 @@ public class PMMLModelProcessorTestCase {
         executionPlanRuntime.shutdown();
     }
 
-//    @Test
-//    public void predictFunctionWithSelectedAttributesTest() throws InterruptedException, URISyntaxException {
-//
-//        URL resource = PMMLModelProcessorTestCase.class.getResource("/decision-tree.pmml");
-//        String modelStorageLocation = new File(resource.toURI()).getAbsolutePath();
-//
-//        SiddhiManager siddhiManager = new SiddhiManager();
-//
-//        String inputStream = "define stream InputStream " +
-//                "(response double, root_shell double, su_attempted double, num_root double, num_file_creations double, num_shells double, num_access_files double, num_outbound_cmds double, is_host_login double, is_guest_login double, count double, srv_count double, serror_rate double, srv_serror_rate double);";
-//
-//        String query = "@info(name = 'query1') " +
-//                "from InputStream#pmml:predict('" + modelStorageLocation + "', NumPregnancies, PG2, DBP, TSFT, SI2, BMI, DPF, Age) " +
-//                "select prediction " +
-//                "insert into outputStream ;";
-//
-//        ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(inputStream + query);
-//
-//        executionPlanRuntime.addCallback("query1", new QueryCallback() {
-//            @Override
-//            public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
-//                EventPrinter.print(timeStamp, inEvents, removeEvents);
-//                eventArrived = true;
-//                if (inEvents != null) {
-//                    Assert.assertEquals(0.9176214029655854, inEvents[0].getData(0));
-//                }
-//            }
-//
-//        });
-//
-//        InputHandler inputHandler = executionPlanRuntime.getInputHandler("InputStream");
-//        executionPlanRuntime.start();
-//        inputHandler.send(new Object[]{6, 148, 72, 35, 0, 33.6, 0.627, 50});
-//        Thread.sleep(1000);
-//        junit.framework.Assert.assertTrue(eventArrived);
-//        executionPlanRuntime.shutdown();
-//    }
+    @Test
+    public void predictFunctionWithSelectedAttributesTest() throws InterruptedException, URISyntaxException {
+
+        URL resource = PMMLModelProcessorTestCase.class.getResource("/decision-tree.pmml");
+        String pmmlFile = new File(resource.toURI()).getAbsolutePath();
+
+        SiddhiManager siddhiManager = new SiddhiManager();
+
+        String inputStream = "define stream InputStream " +
+                "(root_shell double, su_attempted double, num_root double, num_file_creations double, num_shells double, num_access_files double, num_outbound_cmds double, is_host_login double, is_guest_login double, count double, srv_count double, serror_rate double, srv_serror_rate double);";
+
+        String query = "@info(name = 'query1') " +
+                "from InputStream#pmml:predict('" + pmmlFile + "', root_shell, su_attempted, num_root, num_file_creations, num_shells, num_access_files, num_outbound_cmds, is_host_login, is_guest_login, count, srv_count, serror_rate, srv_serror_rate) " +
+                "select Predicted_response " +
+                "insert into outputStream ;";
+
+        ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(inputStream + query);
+
+        executionPlanRuntime.addCallback("query1", new QueryCallback() {
+            @Override
+            public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
+                EventPrinter.print(timeStamp, inEvents, removeEvents);
+                eventArrived = true;
+                if (inEvents != null) {
+                    Assert.assertEquals(0.018258426966292134, inEvents[0].getData(2));
+                }
+            }
+
+        });
+
+        InputHandler inputHandler = executionPlanRuntime.getInputHandler("InputStream");
+        executionPlanRuntime.start();
+        inputHandler.send(new Object[]{6, 148, 72, 35, 0, 33.6, 0.627, 50, 1, 2, 3, 4, 5});
+        Thread.sleep(1000);
+        junit.framework.Assert.assertTrue(eventArrived);
+        executionPlanRuntime.shutdown();
+    }
 }
