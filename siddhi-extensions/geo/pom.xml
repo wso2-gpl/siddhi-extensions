@@ -102,7 +102,7 @@
             <artifactId>gson</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.geotools.wso2</groupId>
+            <groupId>org.wso2.orbit.org.geotools</groupId>
             <artifactId>gt-geojson</artifactId>
         </dependency>
     </dependencies>

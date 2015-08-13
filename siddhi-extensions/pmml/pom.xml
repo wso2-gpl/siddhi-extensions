@@ -46,24 +46,20 @@
 			<artifactId>junit</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.jpmml</groupId>
+			<groupId>org.wso2.orbit.org.jpmml</groupId>
 			<artifactId>pmml-model</artifactId>
-			<version>${jpmml.model.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.jpmml</groupId>
+			<groupId>org.wso2.orbit.org.jpmml</groupId>
 			<artifactId>pmml-manager</artifactId>
-			<version>${jpmml.manager.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.jpmml</groupId>
+			<groupId>org.wso2.orbit.org.jpmml</groupId>
 			<artifactId>pmml-schema</artifactId>
-			<version>${jpmml.model.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.jpmml</groupId>
+			<groupId>org.wso2.orbit.org.jpmml</groupId>
 			<artifactId>pmml-evaluator</artifactId>
-			<version>${jpmml.model.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-logging</groupId>
@@ -103,8 +99,4 @@
 		</plugins>
 	</build>
 
-	<properties>
-		<jpmml.manager.version>1.1.19</jpmml.manager.version>
-		<jpmml.model.version>1.1.16</jpmml.model.version>
-	</properties>
 </project>

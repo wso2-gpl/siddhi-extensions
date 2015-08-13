@@ -99,7 +99,7 @@
                 <scope>compile</scope>
             </dependency>
             <dependency>
-                <groupId>edu.stanford.nlp.wso2</groupId>
+                <groupId>org.wso2.orbit.edu.stanford.nlp</groupId>
                 <artifactId>stanford-nlp</artifactId>
                 <version>${stanford-nlp.version}</version>
             </dependency>
@@ -109,14 +109,34 @@
                 <version>${gson.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.geotools.wso2</groupId>
+                <groupId>org.wso2.orbit.org.geotools</groupId>
                 <artifactId>gt-geojson</artifactId>
                 <version>${geotools.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.github.lucarosellini.rJava.wso2</groupId>
+                <groupId>org.wso2.orbit.com.github.lucarosellini.rJava</groupId>
                 <artifactId>r-java</artifactId>
                 <version>${rjava.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.orbit.org.jpmml</groupId>
+                <artifactId>pmml-model</artifactId>
+                <version>${jpmml.model.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.orbit.org.jpmml</groupId>
+                <artifactId>pmml-manager</artifactId>
+                <version>${jpmml.manager.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.orbit.org.jpmml</groupId>
+                <artifactId>pmml-schema</artifactId>
+                <version>${jpmml.model.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.orbit.org.jpmml</groupId>
+                <artifactId>pmml-evaluator</artifactId>
+                <version>${jpmml.model.version}</version>
             </dependency>
 
             <dependency>
@@ -234,9 +254,11 @@
         <mvel2.version>2.0.19</mvel2.version>
         <antlr.runtime.version>3.4</antlr.runtime.version>
         <gson.version>2.2.4</gson.version>
-        <rjava.version>0.9.7-wso2v1</rjava.version>
-        <geotools.version>13.0.0-wso2v1</geotools.version>
-        <stanford-nlp.version>3.4.0-wso2v1</stanford-nlp.version>
+        <rjava.version>0.9.7.wso2v1</rjava.version>
+        <geotools.version>13.0.0.wso2v1</geotools.version>
+        <stanford-nlp.version>3.4.0.wso2v1</stanford-nlp.version>
+        <jpmml.model.version>1.1.16.wso2v1</jpmml.model.version>
+        <jpmml.manager.version>1.1.16.wso2v1</jpmml.manager.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
