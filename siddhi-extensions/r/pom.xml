@@ -43,7 +43,7 @@
             <artifactId>siddhi-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.lucarosellini.rJava.wso2</groupId>
+            <groupId>org.wso2.orbit.com.github.lucarosellini.rJava</groupId>
             <artifactId>r-java</artifactId>
         </dependency>
         <dependency>

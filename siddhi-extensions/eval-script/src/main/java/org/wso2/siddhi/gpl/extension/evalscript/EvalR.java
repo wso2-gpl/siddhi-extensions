@@ -20,10 +20,9 @@ package org.wso2.siddhi.gpl.extension.evalscript;
 
 import org.rosuda.REngine.JRI.JRIEngine;
 import org.rosuda.REngine.*;
+import org.wso2.siddhi.core.exception.ExecutionPlanCreationException;
+import org.wso2.siddhi.core.exception.ExecutionPlanRuntimeException;
 import org.wso2.siddhi.core.function.EvalScript;
-import org.wso2.siddhi.extension.evalscript.exceptions.FunctionEvaluationException;
-import org.wso2.siddhi.extension.evalscript.exceptions.FunctionInitializationException;
-import org.wso2.siddhi.extension.evalscript.exceptions.FunctionReturnTypeNotPresent;
 import org.wso2.siddhi.query.api.definition.Attribute;
 import org.wso2.siddhi.query.api.definition.Attribute.Type;
 
@@ -45,7 +44,7 @@ public class EvalR implements EvalScript {
             env = rEngine.newEnvironment(null, true);
 
         } catch (Exception e) {
-            throw new FunctionInitializationException("Error while initializing the REngine", e);
+            throw new ExecutionPlanCreationException("Error while initializing the REngine", e);
         }
 
         try {
@@ -55,7 +54,7 @@ public class EvalR implements EvalScript {
             // Parse the function call in R
             functionCall = rEngine.parse(name + "(data)", false);
         } catch (Exception e) {
-            throw new FunctionInitializationException("Compilation failure of the R function " + name, e);
+            throw new ExecutionPlanCreationException("Compilation failure of the R function " + name, e);
         }
     }
 
@@ -105,20 +104,17 @@ public class EvalR implements EvalScript {
                 default:
                     break;
             }
-            throw new FunctionEvaluationException(
+            throw new ExecutionPlanRuntimeException(
                     "Wrong return type detected. Expected: " + returnType
                             + " found: " + result.asNativeJavaObject().getClass().getCanonicalName());
 
         } catch (Exception e) {
-            throw new FunctionEvaluationException("Error evaluating R function " + functionName, e);
+            throw new ExecutionPlanRuntimeException("Error evaluating R function " + functionName, e);
         }
     }
 
     @Override
     public void setReturnType(Type returnType) {
-        if (returnType == null) {
-            throw new FunctionReturnTypeNotPresent("Cannot find the return type of the function " + functionName);
-        }
         this.returnType = returnType;
     }
 

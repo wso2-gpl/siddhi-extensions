@@ -49,7 +49,7 @@
             <artifactId>siddhi-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>edu.stanford.nlp.wso2</groupId>
+            <groupId>org.wso2.orbit.edu.stanford.nlp</groupId>
             <artifactId>stanford-nlp</artifactId>
         </dependency>
         <dependency>
