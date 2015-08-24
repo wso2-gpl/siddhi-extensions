@@ -58,7 +58,7 @@ public class PmmlModelProcessor extends StreamProcessor {
 
     private String pmmlDefinition;
     private boolean attributeSelectionAvailable;
-    private Map<FieldName, Integer> attributeIndexMap;           // <feature-name, attribute-index> pairs
+    private Map<FieldName, int[]> attributeIndexMap;           // <feature-name, [event-array-type][attribute-index]> pairs
     
     private List<FieldName> inputFields;        // All the input fields defined in the pmml definition
     private List<FieldName> outputFields;       // Output fields of the pmml definition
@@ -70,20 +70,22 @@ public class PmmlModelProcessor extends StreamProcessor {
         StreamEvent event = streamEventChunk.getFirst();
         Map<FieldName, FieldValue> inData = new HashMap<FieldName, FieldValue>();
 
-        Object[] data;
-        if (attributeSelectionAvailable) {
-            data = event.getBeforeWindowData();
-        } else {
-            data = event.getOutputData();
-        }
-
-        for(Map.Entry<FieldName, Integer> entry : attributeIndexMap.entrySet()) {
+        for (Map.Entry<FieldName, int[]> entry : attributeIndexMap.entrySet()) {
             FieldName featureName = entry.getKey();
-            int attributeIndex = entry.getValue();
-            inData.put(featureName, EvaluatorUtil.prepare(evaluator, featureName, String.valueOf(data[attributeIndex])));
+            int[] attributeIndexArray = entry.getValue();
+            Object dataValue = null;
+            switch (attributeIndexArray[2]) {
+                case 0:
+                    dataValue = event.getBeforeWindowData()[attributeIndexArray[3]];
+                    break;
+                case 2:
+                    dataValue = event.getOutputData()[attributeIndexArray[3]];
+                    break;
+            }
+            inData.put(featureName, EvaluatorUtil.prepare(evaluator, featureName, String.valueOf(dataValue)));
         }
 
-        if(!inData.isEmpty()) {
+        if (!inData.isEmpty()) {
             try {
                 Map<FieldName, ?> result = evaluator.evaluate(inData);
                 Object[] output = new Object[result.size()];
@@ -92,12 +94,11 @@ public class PmmlModelProcessor extends StreamProcessor {
                     output[i] = EvaluatorUtil.decode(result.get(fieldName));
                     i++;
                 }
-
                 complexEventPopulater.populateComplexEvent(event, output);
                 nextProcessor.process(streamEventChunk);
             } catch (Exception e) {
                 log.error("Error while predicting", e);
-                throw new ExecutionPlanRuntimeException("Error while predicting" ,e);
+                throw new ExecutionPlanRuntimeException("Error while predicting", e);
             }
         }
     }
@@ -177,7 +178,7 @@ public class PmmlModelProcessor extends StreamProcessor {
      */
     private void populateFeatureAttributeMapping() throws Exception {
 
-        attributeIndexMap = new HashMap<FieldName, Integer>();
+        attributeIndexMap = new HashMap<FieldName, int[]>();
         HashMap<String, FieldName> features = new HashMap<String, FieldName>();
 
         for (FieldName fieldName : inputFields) {
@@ -191,8 +192,7 @@ public class PmmlModelProcessor extends StreamProcessor {
                     VariableExpressionExecutor variable = (VariableExpressionExecutor) expressionExecutor;
                     String variableName = variable.getAttribute().getName();
                     if (features.get(variableName) != null) {
-                        int attributeIndex = index;
-                        attributeIndexMap.put(features.get(variableName), attributeIndex);
+                        attributeIndexMap.put(features.get(variableName), variable.getPosition());
                     } else {
                         throw new ExecutionPlanCreationException("No matching feature name found in the model " +
                                 "for the attribute : " + variableName);
@@ -204,8 +204,10 @@ public class PmmlModelProcessor extends StreamProcessor {
             String[] attributeNames = inputDefinition.getAttributeNameArray();
             for(String attributeName : attributeNames) {
                 if (features.get(attributeName) != null) {
-                    int attributeIndex = inputDefinition.getAttributePosition(attributeName);
-                    attributeIndexMap.put(features.get(attributeName), attributeIndex);
+                    int[] attributeIndexArray = new int[4];
+                    attributeIndexArray[2] = 2; // get values from output data
+                    attributeIndexArray[3] = inputDefinition.getAttributePosition(attributeName);
+                    attributeIndexMap.put(features.get(attributeName), attributeIndexArray);
                 } else {
                     throw new ExecutionPlanCreationException("No matching feature name found in the model " +
                             "for the attribute : " + attributeName);
