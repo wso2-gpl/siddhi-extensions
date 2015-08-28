@@ -12,3 +12,4 @@ Features Supported
  - Geo
  - R
  - Eval Script - R
+ - PMML
