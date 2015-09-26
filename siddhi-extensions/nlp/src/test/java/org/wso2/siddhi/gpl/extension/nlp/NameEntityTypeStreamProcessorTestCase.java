@@ -20,9 +20,7 @@ package org.wso2.siddhi.gpl.extension.nlp;
 import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.wso2.siddhi.core.ExecutionPlanRuntime;
 import org.wso2.siddhi.core.event.Event;
-import org.wso2.siddhi.core.query.output.callback.QueryCallback;
 import org.wso2.siddhi.query.api.exception.ExecutionPlanValidationException;
 
 import java.util.ArrayList;
@@ -34,11 +32,11 @@ public class NameEntityTypeStreamProcessorTestCase extends NlpTransformProcessor
     private static Logger logger = Logger.getLogger(NameEntityTypeStreamProcessorTestCase.class);
     private String defineStream = "@config(async = 'true') define stream NameEntityTypeIn (username string, " +
             "text string ); \n";
+    static List<String[]> data = new ArrayList<String[]>();
+
 
     @BeforeClass
     public static void loadData() {
-        data = new ArrayList<String[]>();
-
         data.add(new String[]{"Onasis Elom Gaisie",
                 "RT @BBCAfrica: #Ghana President John Mahama, the chairman of regional body Ecowas, " +
                         "is on a one day tour of three West African countries wra…"});
@@ -66,7 +64,7 @@ public class NameEntityTypeStreamProcessorTestCase extends NlpTransformProcessor
         //InStream event index for each expected match defined above
         int[] matchedInStreamIndices = {0, 0, 1, 1, 2, 2, 2, 4, 4, 6};
 
-        assertOutput(outputEvents, expectedMatches, matchedInStreamIndices);
+        assertOutput(outputEvents, expectedMatches, matchedInStreamIndices, data);
     }
 
     @Test
@@ -78,7 +76,7 @@ public class NameEntityTypeStreamProcessorTestCase extends NlpTransformProcessor
         //InStream event index for each expected match defined above
         int[] matchedInStreamIndices = {0, 1, 2, 2, 4, 6};
 
-        assertOutput(outputEvents, expectedMatches, matchedInStreamIndices);
+        assertOutput(outputEvents, expectedMatches, matchedInStreamIndices, data);
     }
 
     @Test
@@ -90,7 +88,7 @@ public class NameEntityTypeStreamProcessorTestCase extends NlpTransformProcessor
         //InStream event index for each expected match defined above
         int[] matchedInStreamIndices = {0, 6};
 
-        assertOutput(outputEvents, expectedMatches, matchedInStreamIndices);
+        assertOutput(outputEvents, expectedMatches, matchedInStreamIndices, data);
     }
 
     @Test
@@ -102,7 +100,7 @@ public class NameEntityTypeStreamProcessorTestCase extends NlpTransformProcessor
         //InStream event index for each expected match defined above
         int[] matchedInStreamIndices = {1, 1, 1, 2, 3, 3};
 
-        assertOutput(outputEvents, expectedMatches, matchedInStreamIndices);
+        assertOutput(outputEvents, expectedMatches, matchedInStreamIndices, data);
     }
 
     @Test
@@ -114,7 +112,7 @@ public class NameEntityTypeStreamProcessorTestCase extends NlpTransformProcessor
         //InStream event index for each expected match defined above
         int[] matchedInStreamIndices = {2, 2};
 
-        assertOutput(outputEvents, expectedMatches, matchedInStreamIndices);
+        assertOutput(outputEvents, expectedMatches, matchedInStreamIndices, data);
     }
 
     @Test
@@ -183,7 +181,7 @@ public class NameEntityTypeStreamProcessorTestCase extends NlpTransformProcessor
                 "        insert into FindNameEntityTypeResult;\n";
 
         logger.info(String.format(query, entityType, groupSuccessiveEntities));
-        return runQuery(String.format(query, entityType, groupSuccessiveEntities), "query1", "NameEntityTypeIn");
+        return runQuery(String.format(query, entityType, groupSuccessiveEntities), "query1", "NameEntityTypeIn", data);
     }
 
 

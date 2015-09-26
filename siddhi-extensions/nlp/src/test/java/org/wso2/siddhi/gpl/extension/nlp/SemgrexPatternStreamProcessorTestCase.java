@@ -31,10 +31,10 @@ import static org.junit.Assert.assertEquals;
 public class SemgrexPatternStreamProcessorTestCase extends NlpTransformProcessorTestCase {
     private static Logger logger = Logger.getLogger(SemgrexPatternStreamProcessorTestCase.class);
     private static String defineStream = "define stream SemgrexPatternIn(username string, text string);";
+    static List<String[]> data = new ArrayList<String[]>();
 
     @BeforeClass
     public static void loadData() throws Exception {
-        data = new ArrayList<String[]>();
 
         data.add(new String[]{"Leighton Early",
                 "4th Doctor Dies of Ebola in Sierra Leone"});
@@ -105,6 +105,6 @@ public class SemgrexPatternStreamProcessorTestCase extends NlpTransformProcessor
                 "        ( '%s', text ) \n" +
                 "        select *  \n" +
                 "        insert into FindSemgrexPatternResult;\n";
-        return runQuery(defineStream + String.format(query, regex), "query1", "SemgrexPatternIn");
+        return runQuery(defineStream + String.format(query, regex), "query1", "SemgrexPatternIn", data);
     }
 }

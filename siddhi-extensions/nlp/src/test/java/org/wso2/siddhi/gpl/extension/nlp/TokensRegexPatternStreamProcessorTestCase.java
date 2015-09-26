@@ -31,10 +31,10 @@ import static org.junit.Assert.assertEquals;
 public class TokensRegexPatternStreamProcessorTestCase extends NlpTransformProcessorTestCase {
     private static Logger logger = Logger.getLogger(TokensRegexPatternStreamProcessorTestCase.class);
     private static String defineStream = "define stream TokenRegexPatternIn(regex string, text string);";
+    static List<String[]> data = new ArrayList<String[]>();
 
     @BeforeClass
     public static void loadData() throws Exception {
-        data = new ArrayList<String[]>();
 
         data.add(new String[]{"Professeur Jamelski",
                 "Bill Gates donates $31million to fight Ebola http://t.co/Lw8iJUKlmw http://t.co/wWVGNAvlkC"});
@@ -105,6 +105,6 @@ public class TokensRegexPatternStreamProcessorTestCase extends NlpTransformProce
                 "        select *  \n" +
                 "        insert into TokenRegexPatternResult;\n";
         start = System.currentTimeMillis();
-        return runQuery(defineStream + String.format(query, regex), "query1", "TokenRegexPatternIn");
+        return runQuery(defineStream + String.format(query, regex), "query1", "TokenRegexPatternIn", data);
     }
 }

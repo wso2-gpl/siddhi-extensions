@@ -29,6 +29,7 @@ import java.util.List;
 public class NameEntityTypeViaDictionaryStreamProcessorTestCase extends NlpTransformProcessorTestCase {
     private static Logger logger = Logger.getLogger(NameEntityTypeViaDictionaryStreamProcessorTestCase.class);
     private static String defineStream = "define stream NameEntityTypeViaDictionaryIn (username string, text string);";
+    static List<String[]> data = new ArrayList<String[]>();
 
     @BeforeClass
     public static void loadData() {
@@ -96,7 +97,7 @@ public class NameEntityTypeViaDictionaryStreamProcessorTestCase extends NlpTrans
         //InStream event index for each expected match defined above
         int[] matchedInStreamIndices = {3, 6, 8, 9, 14, 19};
 
-        assertOutput(outputEvents, expectedMatches, matchedInStreamIndices);
+        assertOutput(outputEvents, expectedMatches, matchedInStreamIndices, data);
     }
 
     @Test
@@ -109,7 +110,7 @@ public class NameEntityTypeViaDictionaryStreamProcessorTestCase extends NlpTrans
         //InStream event index for each expected match defined above
         int[] matchedInStreamIndices = {1, 2, 2, 3, 13, 15};
 
-        assertOutput(outputEvents, expectedMatches, matchedInStreamIndices);
+        assertOutput(outputEvents, expectedMatches, matchedInStreamIndices, data);
     }
 
     @Test
@@ -122,7 +123,7 @@ public class NameEntityTypeViaDictionaryStreamProcessorTestCase extends NlpTrans
         //InStream event index for each expected match defined above
         int[] matchedInStreamIndices = {3, 9, 10, 11};
 
-        assertOutput(outputEvents, expectedMatches, matchedInStreamIndices);
+        assertOutput(outputEvents, expectedMatches, matchedInStreamIndices, data);
     }
 
     @Test
@@ -135,7 +136,7 @@ public class NameEntityTypeViaDictionaryStreamProcessorTestCase extends NlpTrans
         //InStream event index for each expected match defined above
         int[] matchedInStreamIndices = {5, 6, 7, 8, 13, 19};
 
-        assertOutput(outputEvents, expectedMatches, matchedInStreamIndices);
+        assertOutput(outputEvents, expectedMatches, matchedInStreamIndices, data);
     }
 
     @Test(expected = ExecutionPlanValidationException.class)
@@ -182,6 +183,6 @@ public class NameEntityTypeViaDictionaryStreamProcessorTestCase extends NlpTrans
                 "        select *  \n" +
                 "        insert into FindNameEntityTypeViaDictionaryResult;\n";
 
-        return runQuery(defineStream + String.format(query, entityType, filePath), "query1", "NameEntityTypeViaDictionaryIn");
+        return runQuery(defineStream + String.format(query, entityType, filePath), "query1", "NameEntityTypeViaDictionaryIn", data);
     }
 }

@@ -31,10 +31,10 @@ import static org.junit.Assert.assertEquals;
 public class RelationshipByVerbStreamProcessorTestCase extends NlpTransformProcessorTestCase {
     private static Logger logger = Logger.getLogger(RelationshipByVerbStreamProcessorTestCase.class);
     private static String defineStream = "define stream RelationshipByVerbIn(username string, text string);";
+    static List<String[]> data = new ArrayList<String[]>();
 
     @BeforeClass
     public static void loadData() throws Exception {
-        data = new ArrayList<String[]>();
 
         data.add(new String[]{"Democracy Now!",
                 "@Laurie_Garrett says the world response to Ebola outbreak is extremely slow & lacking."});
@@ -118,6 +118,6 @@ public class RelationshipByVerbStreamProcessorTestCase extends NlpTransformProce
                 "        ( '%s', text ) \n" +
                 "        select *  \n" +
                 "        insert into FindRelationshipByVerbResult;\n";
-        return runQuery(defineStream + String.format(query, regex), "query1", "RelationshipByVerbIn");
+        return runQuery(defineStream + String.format(query, regex), "query1", "RelationshipByVerbIn", data);
     }
 }

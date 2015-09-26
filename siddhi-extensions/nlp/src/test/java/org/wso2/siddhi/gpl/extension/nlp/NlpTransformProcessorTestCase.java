@@ -31,31 +31,26 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-/**
- * Created by malithi on 9/10/14.
- */
 public abstract class NlpTransformProcessorTestCase {
 
     private static Logger logger = Logger.getLogger(NlpTransformProcessorTestCase.class);
-    protected static List<String[]> data;
-    protected static SiddhiManager siddhiManager;
+    protected SiddhiManager siddhiManager = new SiddhiManager();
 
     protected long start;
     protected long end;
     @BeforeClass
     public static void setUp() throws Exception {
         logger.info("Init Siddhi");
-        siddhiManager = new SiddhiManager();
     }
 
-    protected void generateEvents(ExecutionPlanRuntime executionPlanRuntime, String dataIn) throws Exception {
+    protected void generateEvents(ExecutionPlanRuntime executionPlanRuntime, String dataIn, List<String[]> data) throws Exception {
         InputHandler inputHandler = executionPlanRuntime.getInputHandler(dataIn);
         for (Object[] dataLine : data) {
             inputHandler.send(dataLine);
         }
     }
 
-    protected void assertOutput(List<Event> outputEvents, String[] expectedMatches, int[] inStreamIndices) {
+    protected void assertOutput(List<Event> outputEvents, String[] expectedMatches, int[] inStreamIndices, List<String[]> data) {
         for (int i = 0; i < outputEvents.size(); i++) {
             Event event = outputEvents.get(i);
             //Compare expected output stream match and received match
@@ -72,7 +67,7 @@ public abstract class NlpTransformProcessorTestCase {
         Thread.sleep(1000);
     }
 
-    protected List<Event> runQuery(String query, String queryName, String dataInStreamName) throws Exception {
+    protected List<Event> runQuery(String query, String queryName, String dataInStreamName, List<String[]> data) throws Exception {
         start = System.currentTimeMillis();
         ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(query);
         end = System.currentTimeMillis();
@@ -89,7 +84,7 @@ public abstract class NlpTransformProcessorTestCase {
             }
         });
         executionPlanRuntime.start();
-        generateEvents(executionPlanRuntime, dataInStreamName);
+        generateEvents(executionPlanRuntime, dataInStreamName, data);
 
         return eventList;
     }

@@ -31,10 +31,10 @@ import static org.junit.Assert.assertEquals;
 public class RelationshipByRegexStreamProcessorTestCase extends NlpTransformProcessorTestCase {
     private static Logger logger = Logger.getLogger(RelationshipByRegexStreamProcessorTestCase.class);
     private static String defineStream = "define stream RelationshipByRegexIn(username string, text string);";
+    static List<String[]> data = new ArrayList<String[]>();
 
     @BeforeClass
     public static void loadData() throws Exception {
-        data = new ArrayList<String[]>();
 
         data.add(new String[]{"Professeur Jamelski",
                 "Bill Gates donates $31million to fight Ebola"});
@@ -142,6 +142,6 @@ public class RelationshipByRegexStreamProcessorTestCase extends NlpTransformProc
                 "        ( '%s', text ) \n" +
                 "        select *  \n" +
                 "        insert into FindRelationshipByRegexResult;\n";
-        return runQuery(defineStream + String.format(query, regex), "query1", "RelationshipByRegexIn");
+        return runQuery(defineStream + String.format(query, regex), "query1", "RelationshipByRegexIn", data);
     }
 }
