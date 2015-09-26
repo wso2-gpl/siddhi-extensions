@@ -138,6 +138,11 @@
                 <artifactId>pmml-evaluator</artifactId>
                 <version>${jpmml.model.version}</version>
             </dependency>
+            <dependency>
+                <groupId>commons-logging</groupId>
+                <artifactId>commons-logging</artifactId>
+                <version>${commons.logging.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.wso2.siddhi</groupId>
@@ -249,6 +254,7 @@
     </build>
 
     <properties>
+        <siddhi.version>3.0.2</siddhi.version>
         <junit.version>4.10</junit.version>
         <log4j.version>1.2.14</log4j.version>
         <mvel2.version>2.0.19</mvel2.version>
@@ -259,8 +265,7 @@
         <stanford-nlp.version>3.4.0.wso2v1</stanford-nlp.version>
         <jpmml.model.version>1.1.16.wso2v1</jpmml.model.version>
         <jpmml.manager.version>1.1.16.wso2v1</jpmml.manager.version>
-        <siddhi.version>3.0.0</siddhi.version>
-
+        <commons.logging.version>1.1.1</commons.logging.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
