@@ -21,3 +21,4 @@ withindistance=org.wso2.siddhi.gpl.extensions.geo.function.GeoWithinDistanceFunc
 crosses=org.wso2.siddhi.gpl.extensions.geo.stream.GeoCrossesStreamProcessor
 proximity=org.wso2.siddhi.gpl.extensions.geo.stream.GeoProximityStreamProcessor
 stationary=org.wso2.siddhi.gpl.extensions.geo.stream.GeoStationaryStreamProcessor
+closest=org.wso2.siddhi.gpl.extensions.geo.stream.function.GeoClosestStreamFunctionProcessor
