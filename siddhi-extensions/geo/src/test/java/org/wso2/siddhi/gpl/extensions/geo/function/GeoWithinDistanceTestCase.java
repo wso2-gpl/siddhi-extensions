@@ -47,7 +47,7 @@ public class GeoWithinDistanceTestCase extends GeoTestCase {
 
         String executionPlan = "@config(async = 'true') define stream dataIn (geometry string);"
                 + "@info(name = 'query1') from dataIn" +
-                " select geo:withindistance(geometry, \"{'type':'Polygon','coordinates':[[[0, 0],[0, 1],[1, 1],[1, 0],[0, 0]]]}\", 110574.61087757687) as intersects \n" +
+                " select geo:withinDistance(geometry, \"{'type':'Polygon','coordinates':[[[0, 0],[0, 1],[1, 1],[1, 0],[0, 0]]]}\", 110574.61087757687) as intersects \n" +
                 " insert into dataOut";
 
         long start = System.currentTimeMillis();

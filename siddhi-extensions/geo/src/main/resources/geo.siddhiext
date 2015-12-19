@@ -17,8 +17,8 @@
 
 within=org.wso2.siddhi.gpl.extensions.geo.function.GeoWithinFunctionExecutor
 intersects=org.wso2.siddhi.gpl.extensions.geo.function.GeoIntersectsFunctionExecutor
-withindistance=org.wso2.siddhi.gpl.extensions.geo.function.GeoWithinDistanceFunctionExecutor
+withinDistance=org.wso2.siddhi.gpl.extensions.geo.function.GeoWithinDistanceFunctionExecutor
 crosses=org.wso2.siddhi.gpl.extensions.geo.stream.GeoCrossesStreamProcessor
 proximity=org.wso2.siddhi.gpl.extensions.geo.stream.GeoProximityStreamProcessor
 stationary=org.wso2.siddhi.gpl.extensions.geo.stream.GeoStationaryStreamProcessor
-closest=org.wso2.siddhi.gpl.extensions.geo.stream.function.GeoClosestStreamFunctionProcessor
+closestPoints=org.wso2.siddhi.gpl.extensions.geo.stream.function.GeoClosestPointsStreamFunctionProcessor

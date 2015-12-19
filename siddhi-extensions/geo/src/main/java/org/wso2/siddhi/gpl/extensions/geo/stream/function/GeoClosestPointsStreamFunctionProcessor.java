@@ -12,7 +12,7 @@ import org.wso2.siddhi.query.api.definition.Attribute;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GeoClosestStreamFunctionProcessor extends StreamFunctionProcessor {
+public class GeoClosestPointsStreamFunctionProcessor extends StreamFunctionProcessor {
 
     GeoOperation geoOperation;
 
@@ -21,10 +21,10 @@ public class GeoClosestStreamFunctionProcessor extends StreamFunctionProcessor {
         this.geoOperation = new ClosestOperation();
         this.geoOperation.init(attributeExpressionExecutors, 0, attributeExpressionExecutors.length);
         ArrayList<Attribute> attributeList = new ArrayList<Attribute>(4);
-        attributeList.add(new Attribute("geo1latitude", Attribute.Type.DOUBLE));
-        attributeList.add(new Attribute("geo1longitude", Attribute.Type.DOUBLE));
-        attributeList.add(new Attribute("geo2latitude", Attribute.Type.DOUBLE));
-        attributeList.add(new Attribute("geo2longitude", Attribute.Type.DOUBLE));
+        attributeList.add(new Attribute("closestPointOf1From2Latitude", Attribute.Type.DOUBLE));
+        attributeList.add(new Attribute("closestPointOf1From2Longitude", Attribute.Type.DOUBLE));
+        attributeList.add(new Attribute("closestPointOf2From1Latitude", Attribute.Type.DOUBLE));
+        attributeList.add(new Attribute("closestPointOf2From1Longitude", Attribute.Type.DOUBLE));
         return attributeList;
     }
 

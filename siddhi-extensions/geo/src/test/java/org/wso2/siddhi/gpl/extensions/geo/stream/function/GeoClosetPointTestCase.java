@@ -49,8 +49,8 @@ public class GeoClosetPointTestCase extends GeoTestCase {
 //    }
 
     @Test
-    public void testClosest() throws Exception {
-        logger.info("testClosest");
+    public void testClosestPoints() throws Exception {
+        logger.info("testClosestPoints");
 
         data.clear();
         expectedResult.clear();
@@ -69,8 +69,8 @@ public class GeoClosetPointTestCase extends GeoTestCase {
         expectedResult.add(false);
 
         String executionPlan = "@config(async = 'true') define stream dataIn (id string, longitude double, latitude double);"
-                + "@info(name = 'query1') from dataIn#geo:closest(longitude,latitude,\"{'type':'Polygon','coordinates':[[[0,0],[0,2],[1,2],[1,0],[0,0]]]}\") " +
-                "select geo1latitude, geo1longitude, geo2latitude, geo2longitude " +
+                + "@info(name = 'query1') from dataIn#geo:closestPoints(longitude,latitude,\"{'type':'Polygon','coordinates':[[[0,0],[0,2],[1,2],[1,0],[0,0]]]}\") " +
+                "select closestPointOf1From2Latitude, closestPointOf1From2Longitude, closestPointOf2From1Latitude, closestPointOf2From1Longitude " +
                 " \n" +
                 "insert into dataOut";
 
@@ -116,8 +116,8 @@ public class GeoClosetPointTestCase extends GeoTestCase {
 
 
     @Test
-    public void testClosestGeometry() throws Exception {
-        logger.info("testClosestGeometry");
+    public void testClosestPointsGeometry() throws Exception {
+        logger.info("testClosestPointsGeometry");
 
         data.clear();
         expectedResult.clear();
@@ -136,8 +136,8 @@ public class GeoClosetPointTestCase extends GeoTestCase {
         expectedResult.add(true);
 
         String executionPlan = "@config(async = 'true') define stream dataIn (id string, geometry string);"
-                + "@info(name = 'query1') from dataIn#geo:closest(geometry,\"{'type':'Polygon','coordinates':[[[0,0],[0,4],[3,4],[3,0],[0,0]]]}\") " +
-                "select geo1latitude, geo1longitude, geo2latitude, geo2longitude \n" +
+                + "@info(name = 'query1') from dataIn#geo:closestPoints(geometry,\"{'type':'Polygon','coordinates':[[[0,0],[0,4],[3,4],[3,0],[0,0]]]}\") " +
+                "select closestPointOf1From2Latitude, closestPointOf1From2Longitude, closestPointOf2From1Latitude, closestPointOf2From1Longitude \n" +
                 "insert into dataOut";
 
         long start = System.currentTimeMillis();
@@ -171,51 +171,6 @@ public class GeoClosetPointTestCase extends GeoTestCase {
                             break;
 
                     }
-                }
-            }
-        });
-        executionPlanRuntime.start();
-        generateEvents(executionPlanRuntime);
-        Thread.sleep(1000);
-//        Assert.assertEquals(expectedResult.size(), eventCount);
-    }
-    @Test
-    public void testGeometry2() throws Exception {
-        logger.info("TestGeometry");
-
-        data.clear();
-        expectedResult.clear();
-        eventCount = 0;
-        data.add(new Object[]{"km-4354", "{'type':'Point', 'coordinates':[1.0, 1.5]}", "{'type':'Polygon','coordinates':[[[0.5, 0.5],[0.5,1.5],[0.75,1.5],[0.75,0.5],[0.5,0.5]]]}"});
-        expectedResult.add(false);
-        data.add(new Object[]{"km-4354", "{'type':'Point', 'coordinates':[1.5, 1.0]}", "{'type': 'Circle', 'radius': 110575, 'coordinates':[1.5, 1.5]}"});
-        expectedResult.add(true);
-        data.add(new Object[]{"km-4354", "{'type': 'Circle', 'radius': 10, 'coordinates':[0.5, 1.5]}", "{'type': 'Circle', 'radius': 110575, 'coordinates':[0.5, 1.5]}"});
-        expectedResult.add(true);
-        data.add(new Object[]{"km-4354", "{'type': 'Circle', 'radius': 20, 'coordinates':[0.5, 1.5]}", "{'type': 'Circle', 'radius': 10, 'coordinates':[0.5, 1.5]}"});
-        expectedResult.add(false);
-        data.add(new Object[]{"km-4354", "{'type':'Point', 'coordinates':[-0.5, 1.0]}", "{'type':'MultiPolygon','coordinates':[[[[0.5, 0.5],[0.5,1.5],[0.75,1.5],[0.75,0.5],[0.5,0.5]]], [[[1, 1],[1,2],[2,2],[2,1],[1,1]]]]}"});
-        expectedResult.add(false);
-        data.add(new Object[]{"km-4354", "{'type':'Polygon','coordinates':[[[0.5, 0.5],[0.5, -0.5],[-0.5, -0.5],[-0.5, 0.5], [0.5, 0.5]]]}", "{'type': 'Circle', 'radius': 110575, 'coordinates':[0, 0]}"});
-        expectedResult.add(true);
-
-        String executionPlan = "@config(async = 'true') define stream dataIn (id string, geometry string, otherGeometry string);"
-                + "@info(name = 'query1') from dataIn " +
-                "select geo:within(geometry,otherGeometry) as notify \n" +
-                " \n" +
-                "insert into dataOut";
-
-        long start = System.currentTimeMillis();
-        ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(executionPlan);
-        long end = System.currentTimeMillis();
-        logger.info(String.format("Time to create ExecutionPlanRunTime: [%f sec]", ((end - start) / 1000f)));
-        executionPlanRuntime.addCallback("query1", new QueryCallback() {
-            @Override
-            public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
-                for (Event event : inEvents) {
-                    logger.info(event);
-                    Boolean isWithin = (Boolean) event.getData(0);
-                    Assert.assertEquals(expectedResult.get(eventCount++), isWithin);
                 }
             }
         });
