@@ -48,13 +48,13 @@ public class AverageLocationTestCase {
 
         ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(
                 "@config(async = 'true') " +
-                "define stream cleanedStream (locationRecorder string, latitude double, longitude double, " +
-                                            "beaconProximity string, uuid string, weight double, timestamp long); " +
-                "@info(name = 'query1') " +
-                "from cleanedStream#geo:locationApproximate(locationRecorder, latitude, longitude, " +
-                                                            "beaconProximity, uuid, weight, timestamp) " +
-                "select * " +
-                "insert into dataOut;");
+                        "define stream cleanedStream (locationRecorder string, latitude double, longitude double, " +
+                        "beaconProximity string, uuid string, weight double, timestamp long); " +
+                        "@info(name = 'query1') " +
+                        "from cleanedStream#geo:locationApproximate(locationRecorder, latitude, longitude, " +
+                        "beaconProximity, uuid, weight, timestamp) " +
+                        "select * " +
+                        "insert into dataOut;");
 
         executionPlanRuntime.addCallback("query1", new QueryCallback() {
             @Override
@@ -72,10 +72,10 @@ public class AverageLocationTestCase {
                         eventArrived = true;
                     } else if (count == 3) {
                         Assert.assertEquals(6.853572272662002, event.getData(7));
-                        Assert.assertEquals(80.34826512892124, event.getData(8));
+                        Assert.assertEquals(true, 80.34826512892124 == (Double) event.getData(8) || 80.34826512892126 == (Double) event.getData(8));
                         eventArrived = true;
                     } else if (count == 4) {
-                        Assert.assertEquals(8.026326160526303, event.getData(7));
+                        Assert.assertEquals(true, 8.026326160526303 == (Double) event.getData(7) || 8.0263261605263 == (Double) event.getData(7));
                         Assert.assertEquals(80.42794459517538, event.getData(8));
                         eventArrived = true;
                     }
@@ -107,13 +107,13 @@ public class AverageLocationTestCase {
 
         ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(
                 "@config(async = 'true') " +
-                "define stream cleanedStream (locationRecorder string, latitude double, longitude double, " +
-                                            "beaconProximity string, uuid string, weight double, timestamp long); " +
-                "@info(name = 'query1') " +
-                "from cleanedStream#geo:locationApproximate(locationRecorder, latitude, longitude, " +
-                                                            "beaconProximity, uuid, weight, timestamp) " +
-                "select * " +
-                "insert into dataOut;");
+                        "define stream cleanedStream (locationRecorder string, latitude double, longitude double, " +
+                        "beaconProximity string, uuid string, weight double, timestamp long); " +
+                        "@info(name = 'query1') " +
+                        "from cleanedStream#geo:locationApproximate(locationRecorder, latitude, longitude, " +
+                        "beaconProximity, uuid, weight, timestamp) " +
+                        "select * " +
+                        "insert into dataOut;");
 
         executionPlanRuntime.addCallback("query1", new QueryCallback() {
             @Override
@@ -131,7 +131,7 @@ public class AverageLocationTestCase {
                         eventArrived = true;
                     } else if (count == 3) {
                         Assert.assertEquals(6.853572272662002, event.getData(7));
-                        Assert.assertEquals(80.34826512892124, event.getData(8));
+                        Assert.assertEquals(true, 80.34826512892124 == (Double) event.getData(8) || 80.34826512892126 == (Double) event.getData(8));
                         eventArrived = true;
                     } else if (count == 4) {
                         Assert.assertEquals(7.322639705655454, event.getData(7));
