@@ -62,7 +62,6 @@ public class GeoProximityStreamProcessor extends StreamProcessor {
         ArrayList<Attribute> attributeList = new ArrayList<Attribute>();
         attributeList.add(new Attribute("proximityWith", Type.STRING));
         attributeList.add(new Attribute("inCloseProximity", Type.BOOL));
-        attributeList.add(new Attribute("proximityId", Type.BOOL));
         return attributeList;
     }
 
