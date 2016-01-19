@@ -22,10 +22,15 @@ import org.junit.Test;
 import org.wso2.siddhi.core.ExecutionPlanRuntime;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.query.output.callback.QueryCallback;
+import org.wso2.siddhi.core.stream.input.InputHandler;
+import org.wso2.siddhi.core.util.EventPrinter;
 import org.wso2.siddhi.gpl.extensions.geo.GeoTestCase;
 
 public class GeoWithinTestCase extends GeoTestCase {
     private static Logger logger = Logger.getLogger(GeoWithinTestCase.class);
+
+    private volatile int count;
+    private volatile boolean eventArrived;
 
     @Test
     public void testPoint() throws Exception {
@@ -48,10 +53,10 @@ public class GeoWithinTestCase extends GeoTestCase {
         expectedResult.add(false);
 
         String executionPlan = "@config(async = 'true') define stream dataIn (id string, longitude double, latitude double);"
-            + "@info(name = 'query1') from dataIn " +
-            "select geo:within(longitude,latitude,\"{'type':'Polygon','coordinates':[[[0,0],[0,2],[1,2],[1,0],[0,0]]]}\") as notify \n" +
-            " \n" +
-            "insert into dataOut";
+                + "@info(name = 'query1') from dataIn " +
+                "select geo:within(longitude,latitude,\"{'type':'Polygon','coordinates':[[[0,0],[0,2],[1,2],[1,0],[0,0]]]}\") as notify \n" +
+                " \n" +
+                "insert into dataOut";
 
         long start = System.currentTimeMillis();
         ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(executionPlan);
@@ -72,6 +77,7 @@ public class GeoWithinTestCase extends GeoTestCase {
         Thread.sleep(1000);
         Assert.assertEquals(expectedResult.size(), eventCount);
     }
+
     @Test
     public void testPoint2() throws Exception {
         logger.info("TestPoint2");
@@ -80,7 +86,7 @@ public class GeoWithinTestCase extends GeoTestCase {
         eventCount = 0;
         data.add(new Object[]{"km-4354", 0.75d, 1d, "{'type':'Polygon','coordinates':[[[0.5, 0.5],[0.5,1.5],[0.75,1.5],[0.75,0.5],[0.5,0.5]]]}"});
         expectedResult.add(false);
-        data.add(new Object[]{"km-4354", 1d, 1d,"{'type': 'Circle', 'radius': 110575, 'coordinates':[1.5, 1.5]}"});
+        data.add(new Object[]{"km-4354", 1d, 1d, "{'type': 'Circle', 'radius': 110575, 'coordinates':[1.5, 1.5]}"});
         expectedResult.add(true);
         data.add(new Object[]{"km-4354", 3d, 3d, "{'type': 'Circle', 'radius': 110575, 'coordinates':[0.5, 1.5]}"});
         expectedResult.add(false);
@@ -116,6 +122,7 @@ public class GeoWithinTestCase extends GeoTestCase {
         Thread.sleep(1000);
         Assert.assertEquals(expectedResult.size(), eventCount);
     }
+
     @Test
     public void testGeometry() throws Exception {
         logger.info("TestGeometry");
@@ -161,6 +168,7 @@ public class GeoWithinTestCase extends GeoTestCase {
         Thread.sleep(1000);
         Assert.assertEquals(expectedResult.size(), eventCount);
     }
+
     @Test
     public void testGeometry2() throws Exception {
         logger.info("TestGeometry");
@@ -205,5 +213,55 @@ public class GeoWithinTestCase extends GeoTestCase {
         generateEvents(executionPlanRuntime);
         Thread.sleep(1000);
         Assert.assertEquals(expectedResult.size(), eventCount);
+    }
+
+    @Test
+    public void testGeometry3() throws Exception {
+        logger.info("TestGeometryJoin");
+
+        count = 0;
+        eventArrived = false;
+        String executionPlan = "" +
+                "define stream dataIn (id string, latitude double, longitude double); " +
+                "define stream dataToTable (id string, geometry string); " +
+                "" +
+                "define table dataTable (id string, geometry string); " +
+                "" +
+                "from dataToTable " +
+                "insert into dataTable; " +
+                "" +
+                "@info(name = 'query1') " +
+                "from dataIn join  dataTable " +
+                "on geo:within(dataIn.latitude, dataIn.longitude, dataTable.geometry) " +
+                "select dataIn.id as dataInID, dataTable.id as dataTableID " +
+                "insert into dataOut; ";
+
+        ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(executionPlan);
+
+        InputHandler dataIn = executionPlanRuntime.getInputHandler("dataIn");
+        InputHandler dataToTable = executionPlanRuntime.getInputHandler("dataToTable");
+
+        executionPlanRuntime.addCallback("query1", new QueryCallback() {
+            @Override
+            public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
+                EventPrinter.print(timeStamp, inEvents, removeEvents);
+                for (Event event : inEvents) {
+                    eventArrived = true;
+                    count++;
+                }
+            }
+        });
+        executionPlanRuntime.start();
+        Thread.sleep(1000);
+
+        dataToTable.send(new Object[]{"1", "{'type': 'Circle', 'radius': 110575, 'coordinates':[1.5, 1.5]}"});
+        dataToTable.send(new Object[]{"2", "{'type': 'Circle', 'radius': 110575, 'coordinates':[12.5, 1.5]}"});
+        Thread.sleep(1000);
+        dataIn.send(new Object[]{"3", 1.5, 1.0});
+        dataIn.send(new Object[]{"4", 7.5, 1.0});
+        Thread.sleep(1000);
+        executionPlanRuntime.shutdown();
+        Assert.assertEquals(1, count);
+        Assert.assertEquals(true, eventArrived);
     }
 }
