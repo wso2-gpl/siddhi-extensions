@@ -151,9 +151,9 @@ public class PmmlModelProcessor extends StreamProcessor {
             if (numOfOutputFields == 0) {
                 dataType = evaluator.getDataField(field).getDataType().toString();
             } else {
-                // if dataType attribute is missing, consider dataType as string(temporary fix)
+                // If dataType attribute is missing, consider dataType as string(temporary fix).
                 if (evaluator.getOutputField(field).getDataType() == null) {
-                    log.info("dataType attribute missing for OutputField. Using String as dataType");
+                    log.info("Attribute dataType missing for OutputField. Using String as dataType");
                     dataType = "string";
                 } else {
                     dataType = evaluator.getOutputField(field).getDataType().toString();
