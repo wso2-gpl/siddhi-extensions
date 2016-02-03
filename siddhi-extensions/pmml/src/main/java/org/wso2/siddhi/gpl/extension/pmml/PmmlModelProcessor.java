@@ -147,7 +147,7 @@ public class PmmlModelProcessor extends StreamProcessor {
         List<Attribute> outputAttributes = new ArrayList<Attribute>();
         int numOfOutputFields = evaluator.getOutputFields().size();
         for (FieldName field : outputFields) {
-            String dataType = null;
+            String dataType;
             if (numOfOutputFields == 0) {
                 dataType = evaluator.getDataField(field).getDataType().toString();
             } else {
