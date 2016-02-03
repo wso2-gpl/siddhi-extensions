@@ -129,7 +129,11 @@ public class PmmlModelProcessor extends StreamProcessor {
         
         evaluator = (Evaluator) pmmlManager.getModelManager(ModelEvaluatorFactory.getInstance());
         inputFields = evaluator.getActiveFields();
-        outputFields = evaluator.getOutputFields();
+        if (evaluator.getOutputFields().size() == 0) {
+            outputFields = evaluator.getTargetFields();
+        } else {
+            outputFields = evaluator.getOutputFields();
+        }
 
         return generateOutputAttributes();
     }
@@ -141,8 +145,20 @@ public class PmmlModelProcessor extends StreamProcessor {
     private List<Attribute> generateOutputAttributes() {
 
         List<Attribute> outputAttributes = new ArrayList<Attribute>();
-        for(FieldName field : outputFields) {
-            String dataType = evaluator.getOutputField(field).getDataType().toString();
+        int numOfOutputFields = evaluator.getOutputFields().size();
+        for (FieldName field : outputFields) {
+            String dataType;
+            if (numOfOutputFields == 0) {
+                dataType = evaluator.getDataField(field).getDataType().toString();
+            } else {
+                // If dataType attribute is missing, consider dataType as string(temporary fix).
+                if (evaluator.getOutputField(field).getDataType() == null) {
+                    log.info("Attribute dataType missing for OutputField. Using String as dataType");
+                    dataType = "string";
+                } else {
+                    dataType = evaluator.getOutputField(field).getDataType().toString();
+                }
+            }
             Attribute.Type type = null;
             if (dataType.equalsIgnoreCase("double")) {
                 type = Attribute.Type.DOUBLE;
@@ -152,10 +168,10 @@ public class PmmlModelProcessor extends StreamProcessor {
                 type = Attribute.Type.INT;
             } else if (dataType.equalsIgnoreCase("long")) {
                 type = Attribute.Type.LONG;
-            } else if (dataType.equalsIgnoreCase("string")) {
-                type = Attribute.Type.STRING;
             } else if (dataType.equalsIgnoreCase("boolean")) {
                 type = Attribute.Type.BOOL;
+            } else if (dataType.equalsIgnoreCase("string")) {
+                type = Attribute.Type.STRING;
             }
             outputAttributes.add(new Attribute(field.getValue(), type));
         }
