@@ -254,7 +254,7 @@
     </build>
 
     <properties>
-        <siddhi.version>3.0.4</siddhi.version>
+        <siddhi.version>3.0.6-SNAPSHOT</siddhi.version>
         <junit.version>4.10</junit.version>
         <log4j.version>1.2.14</log4j.version>
         <mvel2.version>2.0.19</mvel2.version>

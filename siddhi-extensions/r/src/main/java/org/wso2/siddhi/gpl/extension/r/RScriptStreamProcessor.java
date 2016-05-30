@@ -29,7 +29,7 @@ import java.util.List;
 
 public class RScriptStreamProcessor extends RStreamProcessor {
     @Override
-    protected List<Attribute> init(AbstractDefinition abstractDefinition, ExpressionExecutor[] expressionExecutors, ExecutionPlanContext executionPlanContext) {
+    protected List<Attribute> init(AbstractDefinition abstractDefinition, ExpressionExecutor[] expressionExecutors, ExecutionPlanContext executionPlanContext, boolean outputExpectsExpiredEvents) {
 
         if (attributeExpressionExecutors.length < 2) {
             throw new ExecutionPlanCreationException("Wrong number of attributes given. Expected 2 or more, found " +
