@@ -53,7 +53,7 @@ public class GeoStationaryStreamProcessor extends StreamProcessor {
      * @return the additional output attributes introduced by the function
      */
     @Override
-    protected List<Attribute> init(AbstractDefinition inputDefinition, ExpressionExecutor[] attributeExpressionExecutors, ExecutionPlanContext executionPlanContext, boolean outputExpectsExpiredEvents) {
+    protected List<Attribute> init(AbstractDefinition inputDefinition, ExpressionExecutor[] attributeExpressionExecutors, ExecutionPlanContext executionPlanContext) {
         geoOperation = new WithinDistanceOperation();
         geoOperation.init(attributeExpressionExecutors, 1, attributeExpressionLength - 1);
         if (attributeExpressionExecutors[attributeExpressionLength - 1].getReturnType() != Type.DOUBLE) {
