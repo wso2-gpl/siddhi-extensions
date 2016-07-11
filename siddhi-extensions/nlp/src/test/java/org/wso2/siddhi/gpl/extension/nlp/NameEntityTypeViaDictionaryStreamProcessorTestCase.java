@@ -33,7 +33,7 @@ public class NameEntityTypeViaDictionaryStreamProcessorTestCase extends NlpTrans
 
     @BeforeClass
     public static void loadData() {
-        data = new ArrayList<String[]>();
+
         data.add(new String[]{"encomium",
                 "Patrick Sawyer’s chain of Ebola victims"});
         data.add(new String[]{"Onasis Elom Gaisie",
@@ -106,7 +106,7 @@ public class NameEntityTypeViaDictionaryStreamProcessorTestCase extends NlpTrans
         List<Event> outputEvents = testFindNameEntityTypeViaDictionary("LOCATION", dictionaryFilePath);
 
         //expecting words that are of the LOCATION type
-        String[] expectedMatches = {"Africa", "Morocco", "Africa", "Atlanta", "Africa", "Africa"};
+        String[] expectedMatches = {"Africa", "Africa", "Morocco", "Atlanta", "Africa", "Africa"};
         //InStream event index for each expected match defined above
         int[] matchedInStreamIndices = {1, 2, 2, 3, 13, 15};
 

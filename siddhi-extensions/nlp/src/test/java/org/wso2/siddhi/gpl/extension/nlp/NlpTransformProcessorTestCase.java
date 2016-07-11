@@ -54,11 +54,11 @@ public abstract class NlpTransformProcessorTestCase {
         for (int i = 0; i < outputEvents.size(); i++) {
             Event event = outputEvents.get(i);
             //Compare expected output stream match and received match
-            assertEquals(expectedMatches[i], event.getData(0));
+            assertEquals(expectedMatches[i], event.getData(2));
             //Compare expected output stream username and received username
-            assertEquals(data.get(inStreamIndices[i])[0], event.getData(1));
+            assertEquals(data.get(inStreamIndices[i])[0], event.getData(0));
             //Compare expected output stream text and received text
-            assertEquals(data.get(inStreamIndices[i])[1], event.getData(2));
+            assertEquals(data.get(inStreamIndices[i])[1], event.getData(1));
         }
     }
 
@@ -88,5 +88,4 @@ public abstract class NlpTransformProcessorTestCase {
 
         return eventList;
     }
-
 }

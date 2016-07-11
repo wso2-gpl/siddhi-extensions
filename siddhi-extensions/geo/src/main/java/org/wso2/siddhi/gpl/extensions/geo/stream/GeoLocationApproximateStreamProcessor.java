@@ -199,7 +199,7 @@ public class GeoLocationApproximateStreamProcessor extends StreamFunctionProcess
     @Override
     protected List<Attribute> init(AbstractDefinition inputDefinition,
                                    ExpressionExecutor[] attributeExpressionExecutors,
-                                   ExecutionPlanContext executionPlanContext, boolean outputExpectsExpiredEvents) {
+                                   ExecutionPlanContext executionPlanContext) {
         personSpecificRecordLocatorMaps = new ConcurrentHashMap<String, Map<String, BeaconValueHolder>>();
         if (attributeExpressionExecutors.length != 7) {
             throw new ExecutionPlanValidationException("Invalid no of arguments passed to " +

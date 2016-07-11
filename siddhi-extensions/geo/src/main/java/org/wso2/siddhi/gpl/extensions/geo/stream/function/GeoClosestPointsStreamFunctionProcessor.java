@@ -17,7 +17,7 @@ public class GeoClosestPointsStreamFunctionProcessor extends StreamFunctionProce
     GeoOperation geoOperation;
 
     @Override
-    protected List<Attribute> init(AbstractDefinition abstractDefinition, ExpressionExecutor[] expressionExecutors, ExecutionPlanContext executionPlanContext, boolean outputExpectsExpiredEvents) {
+    protected List<Attribute> init(AbstractDefinition abstractDefinition, ExpressionExecutor[] expressionExecutors, ExecutionPlanContext executionPlanContext) {
         this.geoOperation = new ClosestOperation();
         this.geoOperation.init(attributeExpressionExecutors, 0, attributeExpressionExecutors.length);
         ArrayList<Attribute> attributeList = new ArrayList<Attribute>(4);

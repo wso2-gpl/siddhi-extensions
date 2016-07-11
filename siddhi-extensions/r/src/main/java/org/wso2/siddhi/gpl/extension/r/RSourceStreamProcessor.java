@@ -32,7 +32,7 @@ import java.util.List;
 
 public class RSourceStreamProcessor extends RStreamProcessor {
     @Override
-    protected List<Attribute> init(AbstractDefinition abstractDefinition, ExpressionExecutor[] expressionExecutors, ExecutionPlanContext executionPlanContext, boolean outputExpectsExpiredEvents) {
+    protected List<Attribute> init(AbstractDefinition abstractDefinition, ExpressionExecutor[] expressionExecutors, ExecutionPlanContext executionPlanContext) {
 
         if (attributeExpressionExecutors.length < 2) {
             throw new ExecutionPlanCreationException("Wrong number of attributes given. Expected 2 or more, found " +

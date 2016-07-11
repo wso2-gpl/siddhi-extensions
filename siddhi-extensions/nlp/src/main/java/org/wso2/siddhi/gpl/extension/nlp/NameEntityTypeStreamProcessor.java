@@ -44,8 +44,7 @@ import java.util.Properties;
 public class NameEntityTypeStreamProcessor extends StreamProcessor {
 
     private static Logger logger = Logger.getLogger(NameEntityTypeStreamProcessor.class);
-
-    private int[] inStreamParamPosition;
+    
     private Constants.EntityType entityType;
     private boolean groupSuccessiveEntities;
     private StanfordCoreNLP pipeline;
@@ -60,7 +59,7 @@ public class NameEntityTypeStreamProcessor extends StreamProcessor {
     }
 
     @Override
-    protected List<Attribute> init(AbstractDefinition abstractDefinition, ExpressionExecutor[] attributeExpressionExecutors, ExecutionPlanContext executionPlanContext, boolean outputExpectsExpiredEvents) {
+    protected List<Attribute> init(AbstractDefinition abstractDefinition, ExpressionExecutor[] attributeExpressionExecutors, ExecutionPlanContext executionPlanContext) {
         if (logger.isDebugEnabled()) {
             logger.debug("Initializing Query ...");
         }
@@ -109,7 +108,6 @@ public class NameEntityTypeStreamProcessor extends StreamProcessor {
                     ".\nUsage: findNameEntityType(entityType:string, " +
                     "groupSuccessiveEntities:boolean, text:string-variable)");
         }
-        inStreamParamPosition = ((VariableExpressionExecutor) attributeExpressionExecutors[2]).getPosition();
 
         initPipeline();
         ArrayList<Attribute> attributes = new ArrayList<Attribute>(1);
@@ -118,56 +116,61 @@ public class NameEntityTypeStreamProcessor extends StreamProcessor {
     }
 
     @Override
-    protected void process(ComplexEventChunk<StreamEvent> streamEventChunk, Processor processor, StreamEventCloner streamEventCloner, ComplexEventPopulater complexEventPopulater) {
-        while (streamEventChunk.hasNext()) {
-            StreamEvent event = streamEventChunk.next();
+    protected void process(ComplexEventChunk<StreamEvent> streamEventChunk, Processor nextProcessor, StreamEventCloner streamEventCloner, ComplexEventPopulater complexEventPopulater) {
+        synchronized (this) {
+            while (streamEventChunk.hasNext()) {
+                StreamEvent event = streamEventChunk.next();
 
-            if (logger.isDebugEnabled()) {
-                logger.debug(String.format("Event received. Entity Type:%s GroupSuccessiveEntities:%s " +
-                        "Event:%s", entityType.name(), groupSuccessiveEntities, event));
-            }
+                if (logger.isDebugEnabled()) {
+                    logger.debug(String.format("Event received. Entity Type:%s GroupSuccessiveEntities:%s " +
+                            "Event:%s", entityType.name(), groupSuccessiveEntities, event));
+                }
 
-            Annotation document = new Annotation(attributeExpressionExecutors[2].execute(event).toString());
-            pipeline.annotate(document);
+                Annotation document = new Annotation(attributeExpressionExecutors[2].execute(event).toString());
+                pipeline.annotate(document);
 
-            StreamEvent newEvent = null;
-            List<CoreMap> sentences = document.get(CoreAnnotations.SentencesAnnotation.class);
+                StreamEvent newEvent = null;
+                List<CoreMap> sentences = document.get(CoreAnnotations.SentencesAnnotation.class);
 
-            if (groupSuccessiveEntities) {
-                String word;
-                boolean added = false;
+                if (groupSuccessiveEntities) {
+                    String word;
+                    String matchedWord = null;
+                    boolean added = false;
 
-                for (CoreMap sentence : sentences) {
-                    for (CoreLabel token : sentence.get(CoreAnnotations.TokensAnnotation.class)) {
-                        if (entityType.name().equals(token.get(CoreAnnotations.NamedEntityTagAnnotation.class))) {
-                            word = token.get(CoreAnnotations.TextAnnotation.class);
-                            if (added) {
-                                word = newEvent.getAttribute(inStreamParamPosition).toString() + " " + word;
-                                complexEventPopulater.populateComplexEvent(newEvent, new Object[]{word});
+                    for (CoreMap sentence : sentences) {
+                        for (CoreLabel token : sentence.get(CoreAnnotations.TokensAnnotation.class)) {
+                            if (entityType.name().equals(token.get(CoreAnnotations.NamedEntityTagAnnotation.class))) {
+                                word = token.get(CoreAnnotations.TextAnnotation.class);
+                                if (added) {
+                                    word = matchedWord + " " + word;
+                                    complexEventPopulater.populateComplexEvent(newEvent, new Object[]{word});
+                                } else {
+                                    newEvent = streamEventCloner.copyStreamEvent(event);
+                                    complexEventPopulater.populateComplexEvent(newEvent, new Object[]{word});
+                                    streamEventChunk.insertBeforeCurrent(newEvent);
+                                    added = true;
+                                    matchedWord = word;
+                                }
                             } else {
+                                added = false;
+                                matchedWord = null;
+                            }
+                        }
+                    }
+                } else {
+                    for (CoreMap sentence : sentences) {
+                        for (CoreLabel token : sentence.get(CoreAnnotations.TokensAnnotation.class)) {
+                            if (entityType.name().equals(token.get(CoreAnnotations.NamedEntityTagAnnotation.class))) {
+                                String word = token.get(CoreAnnotations.TextAnnotation.class);
                                 newEvent = streamEventCloner.copyStreamEvent(event);
                                 complexEventPopulater.populateComplexEvent(newEvent, new Object[]{word});
                                 streamEventChunk.insertBeforeCurrent(newEvent);
-                                added = true;
                             }
-                        } else {
-                            added = false;
                         }
                     }
                 }
-            } else {
-                for (CoreMap sentence : sentences) {
-                    for (CoreLabel token : sentence.get(CoreAnnotations.TokensAnnotation.class)) {
-                        if (entityType.name().equals(token.get(CoreAnnotations.NamedEntityTagAnnotation.class))) {
-                            String word = token.get(CoreAnnotations.TextAnnotation.class);
-                            newEvent = streamEventCloner.copyStreamEvent(event);
-                            complexEventPopulater.populateComplexEvent(newEvent, new Object[]{word});
-                            streamEventChunk.insertBeforeCurrent(newEvent);
-                        }
-                    }
-                }
+                streamEventChunk.remove();
             }
-            streamEventChunk.remove();
         }
         nextProcessor.process(streamEventChunk);
     }

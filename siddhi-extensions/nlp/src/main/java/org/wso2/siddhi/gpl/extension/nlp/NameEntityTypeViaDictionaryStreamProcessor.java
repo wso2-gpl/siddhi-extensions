@@ -45,7 +45,7 @@ public class NameEntityTypeViaDictionaryStreamProcessor extends StreamProcessor 
     private Dictionary dictionary;
 
     @Override
-    protected List<Attribute> init(AbstractDefinition abstractDefinition, ExpressionExecutor[] attributeExpressionExecutors, ExecutionPlanContext executionPlanContext, boolean outputExpectsExpiredEvents) {
+    protected List<Attribute> init(AbstractDefinition abstractDefinition, ExpressionExecutor[] attributeExpressionExecutors, ExecutionPlanContext executionPlanContext) {
         if (logger.isDebugEnabled()) {
             logger.debug("Initializing Query ...");
         }
@@ -116,33 +116,34 @@ public class NameEntityTypeViaDictionaryStreamProcessor extends StreamProcessor 
     }
 
     @Override
-    protected void process(ComplexEventChunk<StreamEvent> streamEventChunk, Processor processor, StreamEventCloner streamEventCloner, ComplexEventPopulater complexEventPopulater) {
-        while (streamEventChunk.hasNext()) {
-            StreamEvent streamEvent = streamEventChunk.next();
-            if (logger.isDebugEnabled()) {
-                logger.debug(String.format("Event received. Entity Type:%s DictionaryFilePath:%s Event:%s",
-                        entityType.name(), dictionary.getXmlFilePath(), streamEvent));
-            }
-
-            String text = attributeExpressionExecutors[2].execute(streamEvent).toString();
-            ArrayList<String> dictionaryEntries = dictionary.getEntries(entityType);
-
-            if (dictionaryEntries.size() == 0) {
-                streamEventChunk.remove();
-            } else if (dictionaryEntries.size() == 1) {
-                complexEventPopulater.populateComplexEvent(streamEvent, new Object[]{dictionaryEntries.get(0)});
-            } else {
-                for (String entry : dictionaryEntries) {
-                    if (text.contains(entry)) {
-                        StreamEvent newStreamEvent = streamEventCloner.copyStreamEvent(streamEvent);
-                        complexEventPopulater.populateComplexEvent(newStreamEvent, new Object[]{entry});
-                        streamEventChunk.insertBeforeCurrent(newStreamEvent);
-                    }
+    protected void process(ComplexEventChunk<StreamEvent> streamEventChunk, Processor nextProcessor, StreamEventCloner streamEventCloner, ComplexEventPopulater complexEventPopulater) {
+        synchronized (this) {
+            while (streamEventChunk.hasNext()) {
+                StreamEvent streamEvent = streamEventChunk.next();
+                if (logger.isDebugEnabled()) {
+                    logger.debug(String.format("Event received. Entity Type:%s DictionaryFilePath:%s Event:%s",
+                            entityType.name(), dictionary.getXmlFilePath(), streamEvent));
                 }
-                streamEventChunk.remove();
+
+                String text = attributeExpressionExecutors[2].execute(streamEvent).toString();
+                ArrayList<String> dictionaryEntries = dictionary.getEntries(entityType);
+
+                if (dictionaryEntries.size() == 0) {
+                    streamEventChunk.remove();
+                } else if (dictionaryEntries.size() == 1) {
+                    complexEventPopulater.populateComplexEvent(streamEvent, new Object[]{dictionaryEntries.get(0)});
+                } else {
+                    for (String entry : dictionaryEntries) {
+                        if (text.contains(entry)) {
+                            StreamEvent newStreamEvent = streamEventCloner.copyStreamEvent(streamEvent);
+                            complexEventPopulater.populateComplexEvent(newStreamEvent, new Object[]{entry});
+                            streamEventChunk.insertBeforeCurrent(newStreamEvent);
+                        }
+                    }
+                    streamEventChunk.remove();
+                }
             }
         }
-
         nextProcessor.process(streamEventChunk);
     }
 

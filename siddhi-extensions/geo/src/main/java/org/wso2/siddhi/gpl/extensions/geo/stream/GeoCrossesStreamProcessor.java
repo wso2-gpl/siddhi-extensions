@@ -52,7 +52,7 @@ public class GeoCrossesStreamProcessor extends StreamProcessor {
      * @return the additional output attributes introduced by the function
      */
     @Override
-    protected List<Attribute> init(AbstractDefinition inputDefinition, ExpressionExecutor[] attributeExpressionExecutors, ExecutionPlanContext executionPlanContext, boolean outputExpectsExpiredEvents) {
+    protected List<Attribute> init(AbstractDefinition inputDefinition, ExpressionExecutor[] attributeExpressionExecutors, ExecutionPlanContext executionPlanContext) {
         geoOperation = new WithinOperation();
         geoOperation.init(attributeExpressionExecutors, 1, attributeExpressionLength);
         ArrayList<Attribute> attributeList = new ArrayList<Attribute>(1);

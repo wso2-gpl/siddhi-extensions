@@ -61,7 +61,7 @@ public class TokensRegexPatternStreamProcessor extends StreamProcessor {
     }
 
     @Override
-    protected List<Attribute> init(AbstractDefinition abstractDefinition, ExpressionExecutor[] attributeExpressionExecutors, ExecutionPlanContext executionPlanContext, boolean outputExpectsExpiredEvents) {
+    protected List<Attribute> init(AbstractDefinition abstractDefinition, ExpressionExecutor[] attributeExpressionExecutors, ExecutionPlanContext executionPlanContext) {
         if (logger.isDebugEnabled()) {
             logger.debug("Initializing Query ...");
         }
@@ -116,29 +116,31 @@ public class TokensRegexPatternStreamProcessor extends StreamProcessor {
     }
 
     @Override
-    protected void process(ComplexEventChunk<StreamEvent> streamEventChunk, Processor processor, StreamEventCloner streamEventCloner, ComplexEventPopulater complexEventPopulater) {
-        while (streamEventChunk.hasNext()) {
-            StreamEvent streamEvent = streamEventChunk.next();
-            if (logger.isDebugEnabled()) {
-                logger.debug(String.format("Event received. Regex:%s Event:%s", regexPattern.pattern(), streamEvent));
-            }
-
-            Annotation document = pipeline.process(attributeExpressionExecutors[1].execute(streamEvent).toString());
-
-            for (CoreMap sentence : document.get(CoreAnnotations.SentencesAnnotation.class)) {
-                TokenSequenceMatcher matcher = regexPattern.getMatcher(sentence.get(CoreAnnotations.TokensAnnotation.class));
-                while (matcher.find()) {
-                    Object[] data = new Object[attributeCount];
-                    data[0] = matcher.group();
-                    for (int i = 1; i < attributeCount; i++) {
-                        data[i] = matcher.group(i);
-                    }
-                    StreamEvent newStreamEvent = streamEventCloner.copyStreamEvent(streamEvent);
-                    complexEventPopulater.populateComplexEvent(newStreamEvent, data);
-                    streamEventChunk.insertBeforeCurrent(newStreamEvent);
+    protected void process(ComplexEventChunk<StreamEvent> streamEventChunk, Processor nextProcessor, StreamEventCloner streamEventCloner, ComplexEventPopulater complexEventPopulater) {
+        synchronized (this) {
+            while (streamEventChunk.hasNext()) {
+                StreamEvent streamEvent = streamEventChunk.next();
+                if (logger.isDebugEnabled()) {
+                    logger.debug(String.format("Event received. Regex:%s Event:%s", regexPattern.pattern(), streamEvent));
                 }
+
+                Annotation document = pipeline.process(attributeExpressionExecutors[1].execute(streamEvent).toString());
+
+                for (CoreMap sentence : document.get(CoreAnnotations.SentencesAnnotation.class)) {
+                    TokenSequenceMatcher matcher = regexPattern.getMatcher(sentence.get(CoreAnnotations.TokensAnnotation.class));
+                    while (matcher.find()) {
+                        Object[] data = new Object[attributeCount];
+                        data[0] = matcher.group();
+                        for (int i = 1; i < attributeCount; i++) {
+                            data[i] = matcher.group(i);
+                        }
+                        StreamEvent newStreamEvent = streamEventCloner.copyStreamEvent(streamEvent);
+                        complexEventPopulater.populateComplexEvent(newStreamEvent, data);
+                        streamEventChunk.insertBeforeCurrent(newStreamEvent);
+                    }
+                }
+                streamEventChunk.remove();
             }
-            streamEventChunk.remove();
         }
         nextProcessor.process(streamEventChunk);
     }
