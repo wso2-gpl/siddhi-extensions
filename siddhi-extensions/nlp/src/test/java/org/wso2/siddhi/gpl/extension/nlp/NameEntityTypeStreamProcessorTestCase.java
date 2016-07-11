@@ -37,6 +37,7 @@ public class NameEntityTypeStreamProcessorTestCase extends NlpTransformProcessor
 
     @BeforeClass
     public static void loadData() {
+
         data.add(new String[]{"Onasis Elom Gaisie",
                 "RT @BBCAfrica: #Ghana President John Mahama, the chairman of regional body Ecowas, " +
                         "is on a one day tour of three West African countries wra…"});
@@ -47,11 +48,11 @@ public class NameEntityTypeStreamProcessorTestCase extends NlpTransformProcessor
         data.add(new String[]{"Michael Chavez",
                 "Malaysia to send 20 million medical gloves to fight Ebola: Malaysia will send more than 20 million medical rub..."});
         data.add(new String[]{"Professeur Jamelski",
-                "RT @DailyMirror: Bill Gates donates £31million to fight Ebola"});
+                "RT @DailyMirror: Bill Gates donates £ 31million to fight Ebola"});
         data.add(new String[]{"ethioembabidjan",
                 "Foundation commits 50mil USD to fight Ebola | Ethiopian radio and television agency"});
         data.add(new String[]{"The Asian Age",
-                "Obama to ask Congress to approve $88 million to boost anti-Ebola effort:"});
+                "Obama to ask Congress to approve $ 87million to boost anti-Ebola effort:"});
     }
 
     @Test
@@ -120,18 +121,18 @@ public class NameEntityTypeStreamProcessorTestCase extends NlpTransformProcessor
         List<Event> outputEvents = testFindNameEntityType("MONEY", true);
 
         //expecting words that are of the MONEY type
-        String[] expectedMatches = {"# 31million", "$ 88 million"};
+        String[] expectedMatches = {"# 31million", "$ 87million"};
         //InStream event index for each expected match defined above
         int[] matchedInStreamIndex = {4, 6};
 
         for (int i = 0; i < outputEvents.size(); i++) {
             Event event = outputEvents.get(i);
             //Compare expected match and returned match
-            assertEquals(expectedMatches[i], event.getData(0));
+            assertEquals(expectedMatches[i], event.getData(2));
             //Compare expected username and returned username
-            assertEquals(data.get(matchedInStreamIndex[i])[0], event.getData(1));
+            assertEquals(data.get(matchedInStreamIndex[i])[0], event.getData(0));
             //Compare expected text and returned text
-            assertEquals(data.get(matchedInStreamIndex[i])[1], event.getData(2));
+            assertEquals(data.get(matchedInStreamIndex[i])[1], event.getData(1));
         }
     }
 
@@ -183,8 +184,4 @@ public class NameEntityTypeStreamProcessorTestCase extends NlpTransformProcessor
         logger.info(String.format(query, entityType, groupSuccessiveEntities));
         return runQuery(String.format(query, entityType, groupSuccessiveEntities), "query1", "NameEntityTypeIn", data);
     }
-
-
-
-
 }

@@ -81,15 +81,15 @@ public class RelationshipByVerbStreamProcessorTestCase extends NlpTransformProce
         for (int i = 0; i < outputEvents.size(); i++) {
             Event event = outputEvents.get(i);
             //Compare expected subject and received subject
-            assertEquals(expectedSubjects[i], event.getData(0));
+            assertEquals(expectedSubjects[i], event.getData(2));
             //Compare expected object and received object
-            assertEquals(expectedObjects[i], event.getData(1));
+            assertEquals(expectedObjects[i], event.getData(3));
             //Compare expected verb and received verb
-            assertEquals(expectedVerbs[i], event.getData(2));
+            assertEquals(expectedVerbs[i], event.getData(4));
             //Compare expected output stream username and received username
-            assertEquals(data.get(matchedInStreamIndices[i])[0], event.getData(3));
+            assertEquals(data.get(matchedInStreamIndices[i])[0], event.getData(0));
             //Compare expected output stream text and received text
-            assertEquals(data.get(matchedInStreamIndices[i])[1], event.getData(4));
+            assertEquals(data.get(matchedInStreamIndices[i])[1], event.getData(1));
         }
     }
 
