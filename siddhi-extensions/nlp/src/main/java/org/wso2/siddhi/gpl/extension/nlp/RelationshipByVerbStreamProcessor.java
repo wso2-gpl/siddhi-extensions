@@ -125,32 +125,34 @@ public class RelationshipByVerbStreamProcessor extends StreamProcessor {
     }
 
     @Override
-    protected void process(ComplexEventChunk<StreamEvent> streamEventChunk, Processor processor, StreamEventCloner streamEventCloner, ComplexEventPopulater complexEventPopulater) {
-        while (streamEventChunk.hasNext()) {
-            StreamEvent streamEvent = streamEventChunk.next();
-            if (logger.isDebugEnabled()) {
-                logger.debug(String.format("Event received. Verb:%s Event:%s", verb, streamEvent));
+    protected void process(ComplexEventChunk<StreamEvent> streamEventChunk, Processor nextProcessor, StreamEventCloner streamEventCloner, ComplexEventPopulater complexEventPopulater) {
+        synchronized (this) {
+            while (streamEventChunk.hasNext()) {
+                StreamEvent streamEvent = streamEventChunk.next();
+                if (logger.isDebugEnabled()) {
+                    logger.debug(String.format("Event received. Verb:%s Event:%s", verb, streamEvent));
+                }
+
+                Annotation document = pipeline.process(attributeExpressionExecutors[1].execute(streamEvent).toString());
+
+                Set<Event> eventSet = new HashSet<Event>();
+
+                for (CoreMap sentence : document.get(CoreAnnotations.SentencesAnnotation.class)) {
+                    findMatchingEvents(sentence, verbOptSubPattern, eventSet);
+                    findMatchingEvents(sentence, verbOptObjPattern, eventSet);
+                }
+
+                for (Event event : eventSet) {
+                    Object[] data = new Object[3];
+                    data[0] = event.subject;
+                    data[1] = event.object;
+                    data[2] = event.verb;
+                    StreamEvent newStreamEvent = streamEventCloner.copyStreamEvent(streamEvent);
+                    complexEventPopulater.populateComplexEvent(newStreamEvent, data);
+                    streamEventChunk.insertBeforeCurrent(newStreamEvent);
+                }
+                streamEventChunk.remove();
             }
-
-            Annotation document = pipeline.process(attributeExpressionExecutors[1].execute(streamEvent).toString());
-
-            Set<Event> eventSet = new HashSet<Event>();
-
-            for (CoreMap sentence:document.get(CoreAnnotations.SentencesAnnotation.class)){
-                findMatchingEvents(sentence, verbOptSubPattern, eventSet);
-                findMatchingEvents(sentence, verbOptObjPattern, eventSet);
-            }
-
-            for (Event event: eventSet){
-                Object [] data = new Object[3];
-                data[0] = event.subject;
-                data[1] = event.object;
-                data[2] = event.verb;
-                StreamEvent newStreamEvent = streamEventCloner.copyStreamEvent(streamEvent);
-                complexEventPopulater.populateComplexEvent(newStreamEvent, data);
-                streamEventChunk.insertBeforeCurrent(newStreamEvent);
-            }
-            streamEventChunk.remove();
         }
         nextProcessor.process(streamEventChunk);
     }

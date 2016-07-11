@@ -140,35 +140,37 @@ public class RelationshipByRegexStreamProcessor extends StreamProcessor {
     }
 
     @Override
-    protected void process(ComplexEventChunk<StreamEvent> streamEventChunk, Processor processor, StreamEventCloner streamEventCloner, ComplexEventPopulater complexEventPopulater) {
-        while (streamEventChunk.hasNext()) {
-            StreamEvent streamEvent = streamEventChunk.next();
-            if (logger.isDebugEnabled()) {
-                logger.debug(String.format("Event received. Regex:%s Event:%s", regexPattern.pattern(), streamEvent));
-            }
-
-            Annotation document = pipeline.process(attributeExpressionExecutors[1].execute(streamEvent).toString());
-
-            SemgrexMatcher matcher;
-            SemanticGraph graph;
-            for (CoreMap sentence:document.get(CoreAnnotations.SentencesAnnotation.class)){
-                graph = sentence.get(SemanticGraphCoreAnnotations.CollapsedCCProcessedDependenciesAnnotation.class);
-                matcher = regexPattern.matcher(graph);
-
-                while(matcher.find()){
-                    Object [] data = new Object[3];
-                    data[0] = matcher.getNode(Constants.subject) == null ? null : matcher.getNode(Constants.subject)
-                            .word();
-                    data[1] = matcher.getNode(Constants.object) == null  ? null : matcher.getNode(Constants.object)
-                            .word();
-                    data[2] = matcher.getNode(Constants.verb) == null  ? null : matcher.getNode(Constants.verb)
-                            .word();
-                    StreamEvent newStreamEvent = streamEventCloner.copyStreamEvent(streamEvent);
-                    complexEventPopulater.populateComplexEvent(newStreamEvent, data);
-                    streamEventChunk.insertBeforeCurrent(newStreamEvent);
+    protected void process(ComplexEventChunk<StreamEvent> streamEventChunk, Processor nextProcessor, StreamEventCloner streamEventCloner, ComplexEventPopulater complexEventPopulater) {
+        synchronized (this) {
+            while (streamEventChunk.hasNext()) {
+                StreamEvent streamEvent = streamEventChunk.next();
+                if (logger.isDebugEnabled()) {
+                    logger.debug(String.format("Event received. Regex:%s Event:%s", regexPattern.pattern(), streamEvent));
                 }
+
+                Annotation document = pipeline.process(attributeExpressionExecutors[1].execute(streamEvent).toString());
+
+                SemgrexMatcher matcher;
+                SemanticGraph graph;
+                for (CoreMap sentence : document.get(CoreAnnotations.SentencesAnnotation.class)) {
+                    graph = sentence.get(SemanticGraphCoreAnnotations.CollapsedCCProcessedDependenciesAnnotation.class);
+                    matcher = regexPattern.matcher(graph);
+
+                    while (matcher.find()) {
+                        Object[] data = new Object[3];
+                        data[0] = matcher.getNode(Constants.subject) == null ? null : matcher.getNode(Constants.subject)
+                                .word();
+                        data[1] = matcher.getNode(Constants.object) == null ? null : matcher.getNode(Constants.object)
+                                .word();
+                        data[2] = matcher.getNode(Constants.verb) == null ? null : matcher.getNode(Constants.verb)
+                                .word();
+                        StreamEvent newStreamEvent = streamEventCloner.copyStreamEvent(streamEvent);
+                        complexEventPopulater.populateComplexEvent(newStreamEvent, data);
+                        streamEventChunk.insertBeforeCurrent(newStreamEvent);
+                    }
+                }
+                streamEventChunk.remove();
             }
-            streamEventChunk.remove();
         }
         nextProcessor.process(streamEventChunk);
     }

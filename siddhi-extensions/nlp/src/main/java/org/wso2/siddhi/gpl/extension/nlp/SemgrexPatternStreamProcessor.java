@@ -135,38 +135,40 @@ public class SemgrexPatternStreamProcessor extends StreamProcessor {
     }
 
     @Override
-    protected void process(ComplexEventChunk<StreamEvent> streamEventChunk, Processor processor, StreamEventCloner streamEventCloner, ComplexEventPopulater complexEventPopulater) {
-        while (streamEventChunk.hasNext()) {
-            StreamEvent streamEvent = streamEventChunk.next();
+    protected void process(ComplexEventChunk<StreamEvent> streamEventChunk, Processor nextProcessor, StreamEventCloner streamEventCloner, ComplexEventPopulater complexEventPopulater) {
+        synchronized (this) {
+            while (streamEventChunk.hasNext()) {
+                StreamEvent streamEvent = streamEventChunk.next();
 
-            Annotation document = pipeline.process(attributeExpressionExecutors[1].execute(streamEvent).toString());
+                Annotation document = pipeline.process(attributeExpressionExecutors[1].execute(streamEvent).toString());
 
-            for (CoreMap sentence : document.get(CoreAnnotations.SentencesAnnotation.class)) {
-                SemanticGraph graph = sentence.get(SemanticGraphCoreAnnotations.CollapsedCCProcessedDependenciesAnnotation.class);
-                SemgrexMatcher matcher = regexPattern.matcher(graph);
+                for (CoreMap sentence : document.get(CoreAnnotations.SentencesAnnotation.class)) {
+                    SemanticGraph graph = sentence.get(SemanticGraphCoreAnnotations.CollapsedCCProcessedDependenciesAnnotation.class);
+                    SemgrexMatcher matcher = regexPattern.matcher(graph);
 
-                while (matcher.find()) {
-                    Object[] data = new Object[attributeCount];
-                    data[0] = matcher.getMatch().value();
+                    while (matcher.find()) {
+                        Object[] data = new Object[attributeCount];
+                        data[0] = matcher.getMatch().value();
 
-                    for (String nodeName : matcher.getNodeNames()) {
-                        if (namedElementParamPositions.containsKey(nodeName)) {
-                            data[namedElementParamPositions.get(nodeName)] = matcher.getNode(nodeName) == null
-                                    ? null : matcher.getNode(nodeName).word();
+                        for (String nodeName : matcher.getNodeNames()) {
+                            if (namedElementParamPositions.containsKey(nodeName)) {
+                                data[namedElementParamPositions.get(nodeName)] = matcher.getNode(nodeName) == null
+                                        ? null : matcher.getNode(nodeName).word();
+                            }
                         }
-                    }
 
-                    for (String relationName : matcher.getRelationNames()) {
-                        if (namedElementParamPositions.containsKey(relationName)) {
-                            data[namedElementParamPositions.get(relationName)] = matcher.getRelnString(relationName);
+                        for (String relationName : matcher.getRelationNames()) {
+                            if (namedElementParamPositions.containsKey(relationName)) {
+                                data[namedElementParamPositions.get(relationName)] = matcher.getRelnString(relationName);
+                            }
                         }
+                        StreamEvent newStreamEvent = streamEventCloner.copyStreamEvent(streamEvent);
+                        complexEventPopulater.populateComplexEvent(newStreamEvent, data);
+                        streamEventChunk.insertBeforeCurrent(newStreamEvent);
                     }
-                    StreamEvent newStreamEvent = streamEventCloner.copyStreamEvent(streamEvent);
-                    complexEventPopulater.populateComplexEvent(newStreamEvent, data);
-                    streamEventChunk.insertBeforeCurrent(newStreamEvent);
                 }
+                streamEventChunk.remove();
             }
-            streamEventChunk.remove();
         }
         nextProcessor.process(streamEventChunk);
     }
