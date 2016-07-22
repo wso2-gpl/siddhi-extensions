@@ -68,6 +68,10 @@
 		</dependency>
 	</dependencies>
 
+	<properties>
+		<pmml.evaluator.version>1.1.16.wso2v1</pmml.evaluator.version>
+	</properties>
+
 	<build>
 		<plugins>
 			<plugin>
@@ -82,7 +86,10 @@
 							org.wso2.siddhi.gpl.extension.pmml.*
 						</Export-Package>
 						<Import-Package>
-							*;resolution:=optional
+							org.jpmml.evaluator.*; version="${pmml.evaluator.version}",
+							org.jpmml.manager.*; version="${pmml.evaluator.version}",
+							org.jpmml.model.*; version="${pmml.evaluator.version}",
+							org.jpmml.schema.*; version="${pmml.evaluator.version}"
 						</Import-Package>
 						<DynamicImport-Package>*</DynamicImport-Package>
 					</instructions>
