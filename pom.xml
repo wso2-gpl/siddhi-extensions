@@ -28,16 +28,21 @@
     </parent>
     <url>http://wso2.org</url>
 
-    <groupId>org.wso2.siddhi.gpl</groupId>
-    <artifactId>siddhi</artifactId>
-    <packaging>pom</packaging>
+    <groupId>org.wso2.gpl.siddhi.extensions</groupId>
+    <artifactId>siddhi-extensions</artifactId>
     <version>3.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
 
-    <name>Siddhi GPL</name>
+    <name>Siddhi Extensions GPL</name>
+
     <description>Siddhi, high performing Complex Event Processing Engine</description>
 
     <modules>
-        <module>siddhi-extensions</module>
+        <module>nlp</module>
+        <module>geo</module>
+        <module>r</module>
+        <module>pmml</module>
+        <module>eval-script</module>
     </modules>
 
     <licenses>
@@ -48,9 +53,9 @@
     </licenses>
 
     <scm>
-        <url>https://github.com/wso2-gpl/siddhi.git</url>
-        <developerConnection>scm:git:https://github.com/wso2-gpl/siddhi.git</developerConnection>
-        <connection>scm:git:https://github.com/wso2-gpl/siddhi.git</connection>
+        <url>https://github.com/wso2-gpl/siddhi-extensions.git</url>
+        <developerConnection>scm:git:https://github.com/wso2-gpl/siddhi-extensions.git</developerConnection>
+        <connection>scm:git:https://github.com/wso2-gpl/siddhi-extensions.git</connection>
         <tag>HEAD</tag>
     </scm>
 
@@ -295,5 +300,18 @@
             <url>http://repo.opengeo.org</url>
         </repository>
     </repositories>
+
+    <distributionManagement>
+        <repository>
+            <id>wso2.gpl.releases</id>
+            <name>WSO2 GPL Maven Repository</name>
+            <url>http://maven.wso2.org/nexus/content/repositories/wso2gpl/</url>
+        </repository>
+        <snapshotRepository>
+            <id>wso2.gpl.snapshots</id>
+            <name>WSO2 GPL Maven Snapshot Repository</name>
+            <url>http://maven.wso2.org/nexus/content/repositories/wso2gpl-snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
 
 </project>
