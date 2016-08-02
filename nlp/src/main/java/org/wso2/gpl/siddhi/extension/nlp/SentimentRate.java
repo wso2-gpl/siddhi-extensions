@@ -33,6 +33,8 @@ import java.util.Properties;
 
 public class SentimentRate extends FunctionExecutor {
 
+    private StanfordCoreNLP pipeline;
+
     @Override
     public Attribute.Type getReturnType() {
         return Attribute.Type.INT;
@@ -66,6 +68,9 @@ public class SentimentRate extends FunctionExecutor {
                     "Invalid no of arguments passed to SentimentRate:getSentiment() function, "
                             + "required 1, but found " + attributeExpressionExecutors.length);
         }
+        Properties props = new Properties();
+        props.setProperty("annotators", "tokenize, ssplit, parse, sentiment");
+        pipeline = new StanfordCoreNLP(props);
     }
 
     @Override
@@ -75,9 +80,6 @@ public class SentimentRate extends FunctionExecutor {
 
     @Override
     protected Object execute(Object data) {
-        Properties props = new Properties();
-        props.setProperty("annotators", "tokenize, ssplit, parse, sentiment");
-        StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
         int totalRate = 0;
         String[] linesArr = data.toString().toLowerCase().split("\\.");
         for (int i = 0; i < linesArr.length; i++) {
