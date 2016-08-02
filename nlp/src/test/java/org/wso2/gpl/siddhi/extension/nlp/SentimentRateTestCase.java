@@ -78,7 +78,6 @@ public class SentimentRateTestCase {
         inputHandler.send(new Object[] { "Jack is a bad person." });
         inputHandler.send(new Object[] { "Jack is a good person. Jack is a bad person" });
         inputHandler.send(new Object[] { "What is wrong with these people" });
-        Thread.sleep(100);
         executionPlanRuntime.shutdown();
     }
 }

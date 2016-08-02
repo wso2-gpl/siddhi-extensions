@@ -64,7 +64,7 @@ public class SentimentRate extends FunctionExecutor {
         if (attributeExpressionExecutors.length != 1) {
             throw new IllegalArgumentException(
                     "Invalid no of arguments passed to SentimentRate:getSentiment() function, "
-                            + "required less than 3, but found " + attributeExpressionExecutors.length);
+                            + "required 1, but found " + attributeExpressionExecutors.length);
         }
     }
 
