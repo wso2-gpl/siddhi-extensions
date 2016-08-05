@@ -24,6 +24,8 @@ import org.junit.Test;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.query.api.exception.ExecutionPlanValidationException;
 
+import java.io.File;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -90,7 +92,7 @@ public class NameEntityTypeViaDictionaryStreamProcessorTestCase extends NlpTrans
 
     @Test
     public void testFindNameEntityTypePerson() throws Exception {
-        String dictionaryFilePath = this.getClass().getClassLoader().getResource("dictionary.xml").getPath();
+        String dictionaryFilePath = Paths.get(this.getClass().getClassLoader().getResource("dictionary.xml").toURI()).toFile().getAbsolutePath();
         List<Event> outputEvents = testFindNameEntityTypeViaDictionary("PERSON", dictionaryFilePath);
 
         //expecting words that are of the PERSON type
@@ -103,7 +105,7 @@ public class NameEntityTypeViaDictionaryStreamProcessorTestCase extends NlpTrans
 
     @Test
     public void testFindNameEntityTypeLocation() throws Exception {
-        String dictionaryFilePath = this.getClass().getClassLoader().getResource("dictionary.xml").getPath();
+        String dictionaryFilePath = Paths.get(this.getClass().getClassLoader().getResource("dictionary.xml").toURI()).toFile().getAbsolutePath();
         List<Event> outputEvents = testFindNameEntityTypeViaDictionary("LOCATION", dictionaryFilePath);
 
         //expecting words that are of the LOCATION type
@@ -116,7 +118,7 @@ public class NameEntityTypeViaDictionaryStreamProcessorTestCase extends NlpTrans
 
     @Test
     public void testFindNameEntityTypeDate() throws Exception {
-        String dictionaryFilePath = this.getClass().getClassLoader().getResource("dictionary.xml").getPath();
+        String dictionaryFilePath = Paths.get(this.getClass().getClassLoader().getResource("dictionary.xml").toURI()).toFile().getAbsolutePath();
         List<Event> outputEvents = testFindNameEntityTypeViaDictionary("DATE", dictionaryFilePath);
 
         //expecting words that are of the DATE type
@@ -129,7 +131,7 @@ public class NameEntityTypeViaDictionaryStreamProcessorTestCase extends NlpTrans
 
     @Test
     public void testFindNameEntityTypeMoney() throws Exception {
-        String dictionaryFilePath = this.getClass().getClassLoader().getResource("dictionary.xml").getPath();
+        String dictionaryFilePath = Paths.get(this.getClass().getClassLoader().getResource("dictionary.xml").toURI()).toFile().getAbsolutePath();
         List<Event> outputEvents = testFindNameEntityTypeViaDictionary("MONEY", dictionaryFilePath);
 
         //expecting words that are of the MONEY type
@@ -144,7 +146,7 @@ public class NameEntityTypeViaDictionaryStreamProcessorTestCase extends NlpTrans
     public void testQueryCreationExceptionInvalidNoOfParams() {
         logger.info("Test: QueryCreationException at Invalid No Of Params");
         siddhiManager.createExecutionPlanRuntime(defineStream + "from NameEntityTypeViaDictionaryIn#nlp:findNameEntityTypeViaDictionary" +
-                "        ('src/test/resources/dictionaryTest.xml',text) \n" +
+                "        ('src" + File.separator + "test" + File.separator + "resources" + File.separator + "dictionaryTest.xml',text) \n" +
                 "        select *  \n" +
                 "        insert into FindNameEntityTypeViaDictionaryResult;\n");
     }
@@ -153,7 +155,7 @@ public class NameEntityTypeViaDictionaryStreamProcessorTestCase extends NlpTrans
     public void testQueryCreationExceptionTypeMismatchEntityType() {
         logger.info("Test: QueryCreationException at EntityType type mismatch");
         siddhiManager.createExecutionPlanRuntime(defineStream + "from NameEntityTypeViaDictionaryIn#nlp:findNameEntityTypeViaDictionary" +
-                "        ( 1234,'src/test/resources/dictionaryTest.xml',text ) \n" +
+                "        ( 1234,'src" + File.separator + "test" + File.separator + "resources" + File.separator + "dictionaryTest.xml',text ) \n" +
                 "        select *  \n" +
                 "        insert into FindNameEntityTypeViaDictionaryResult;\n");
     }
@@ -162,16 +164,17 @@ public class NameEntityTypeViaDictionaryStreamProcessorTestCase extends NlpTrans
     public void testQueryCreationExceptionInvalidFilePath() {
         logger.info("Test: QueryCreationException at Invalid file path");
         siddhiManager.createExecutionPlanRuntime(defineStream + "from NameEntityTypeViaDictionaryIn#nlp:findNameEntityTypeViaDictionary" +
-                "        ( 'PERSON' , 'src/resources/dictionaryTest.xml', text ) \n" +
+                "        ( 'PERSON' , 'src" + File.separator + "resources" + File.separator + "dictionaryTest.xml', text ) \n" +
                 "        select *  \n" +
                 "        insert into FindNameEntityTypeViaDictionaryResult;\n");
+
     }
 
     @Test(expected = ExecutionPlanValidationException.class)
     public void testQueryCreationExceptionUndefinedEntityType() {
         logger.info("Test: QueryCreationException at undefined EntityType");
         siddhiManager.createExecutionPlanRuntime(defineStream + "from NameEntityTypeViaDictionaryIn#nlp:findNameEntityTypeViaDictionary" +
-                "        ( 'DEGREE' , 'src/test/resources/dictionaryTest.xml', text ) \n" +
+                "        ( 'DEGREE' , 'src" + File.separator + "test" + File.separator + "resources" + File.separator + "dictionaryTest.xml', text ) \n" +
                 "        select *  \n" +
                 "        insert into FindNameEntityTypeViaDictionaryResult;\n");
     }
