@@ -136,24 +136,24 @@ public class NameEntityTypeStreamProcessor extends StreamProcessor {
                 if (groupSuccessiveEntities) {
                     String word;
                     String matchedWord = null;
-                    boolean added = false;
+                    boolean isAdded = false;
 
                     for (CoreMap sentence : sentences) {
                         for (CoreLabel token : sentence.get(CoreAnnotations.TokensAnnotation.class)) {
                             if (entityType.name().equals(token.get(CoreAnnotations.NamedEntityTagAnnotation.class))) {
                                 word = token.get(CoreAnnotations.TextAnnotation.class);
-                                if (added) {
+                                if (isAdded) {
                                     word = matchedWord + " " + word;
                                     complexEventPopulater.populateComplexEvent(newEvent, new Object[]{word});
                                 } else {
                                     newEvent = streamEventCloner.copyStreamEvent(event);
                                     complexEventPopulater.populateComplexEvent(newEvent, new Object[]{word});
                                     streamEventChunk.insertBeforeCurrent(newEvent);
-                                    added = true;
+                                    isAdded = true;
                                     matchedWord = word;
                                 }
                             } else {
-                                added = false;
+                                isAdded = false;
                                 matchedWord = null;
                             }
                         }
