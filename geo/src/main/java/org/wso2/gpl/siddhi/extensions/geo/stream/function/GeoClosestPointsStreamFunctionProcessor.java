@@ -38,7 +38,7 @@ public class GeoClosestPointsStreamFunctionProcessor extends StreamFunctionProce
     protected List<Attribute> init(AbstractDefinition abstractDefinition, ExpressionExecutor[] expressionExecutors, ExecutionPlanContext executionPlanContext) {
         this.geoOperation = new ClosestOperation();
         this.geoOperation.init(attributeExpressionExecutors, 0, attributeExpressionExecutors.length);
-        ArrayList<Attribute> attributeList = new ArrayList<Attribute>(4);
+        List<Attribute> attributeList = new ArrayList<Attribute>(4);
         attributeList.add(new Attribute("closestPointOf1From2Latitude", Attribute.Type.DOUBLE));
         attributeList.add(new Attribute("closestPointOf1From2Longitude", Attribute.Type.DOUBLE));
         attributeList.add(new Attribute("closestPointOf2From1Latitude", Attribute.Type.DOUBLE));

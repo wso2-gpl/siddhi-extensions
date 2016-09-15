@@ -56,7 +56,7 @@ public class GeoCrossesStreamProcessor extends StreamProcessor {
     protected List<Attribute> init(AbstractDefinition inputDefinition, ExpressionExecutor[] attributeExpressionExecutors, ExecutionPlanContext executionPlanContext) {
         geoOperation = new WithinOperation();
         geoOperation.init(attributeExpressionExecutors, 1, attributeExpressionLength);
-        ArrayList<Attribute> attributeList = new ArrayList<Attribute>(1);
+        List<Attribute> attributeList = new ArrayList<Attribute>(1);
         attributeList.add(new Attribute("crosses", Type.BOOL));
         return attributeList;
     }

@@ -47,9 +47,6 @@ public class NameEntityTypeViaDictionaryStreamProcessor extends StreamProcessor 
 
     @Override
     protected List<Attribute> init(AbstractDefinition abstractDefinition, ExpressionExecutor[] attributeExpressionExecutors, ExecutionPlanContext executionPlanContext) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Initializing Query ...");
-        }
 
         if (attributeExpressionLength < 3) {
             throw new ExecutionPlanCreationException("Query expects at least three parameters. Received only " +
