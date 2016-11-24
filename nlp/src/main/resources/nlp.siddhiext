@@ -21,5 +21,5 @@ findRelationshipByRegex=org.wso2.gpl.siddhi.extension.nlp.RelationshipByRegexStr
 findRelationshipByVerb=org.wso2.gpl.siddhi.extension.nlp.RelationshipByVerbStreamProcessor
 findSemgrexPattern=org.wso2.gpl.siddhi.extension.nlp.SemgrexPatternStreamProcessor
 findTokensRegexPattern=org.wso2.gpl.siddhi.extension.nlp.TokensRegexPatternStreamProcessor
-
+getSentimentRate=org.wso2.gpl.siddhi.extension.nlp.SentimentRate
 
